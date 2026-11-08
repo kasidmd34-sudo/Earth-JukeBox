@@ -1,0 +1,2026 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Earth Jukebox — NASA Environmental Intelligence & Sonification Engine</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Leaflet.js for Interactive Geospatial Earth Map -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <!-- Chart.js for Scientific Visualizations -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <style>
+        :root {
+            --bg-base: #080c14;
+            --bg-surface: #0f172a;
+            --bg-card: rgba(17, 24, 39, 0.85);
+            --bg-card-hover: rgba(30, 41, 59, 0.95);
+            --border-color: rgba(51, 65, 85, 0.6);
+            --border-highlight: rgba(56, 189, 248, 0.4);
+            
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            
+            --accent-cyan: #06b6d4;
+            --accent-cyan-glow: rgba(6, 182, 212, 0.25);
+            --accent-blue: #3b82f6;
+            --accent-emerald: #10b981;
+            --accent-amber: #f59e0b;
+            --accent-rose: #f43f5e;
+            --accent-violet: #8b5cf6;
+            
+            --font-main: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+            
+            --radius-lg: 14px;
+            --radius-md: 10px;
+            --radius-sm: 6px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-base);
+            color: var(--text-primary);
+            font-family: var(--font-main);
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+            min-height: 100vh;
+            background-image: 
+                radial-gradient(circle at 15% 15%, rgba(14, 165, 233, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 85% 75%, rgba(139, 92, 246, 0.06) 0%, transparent 40%),
+                radial-gradient(circle at 50% 50%, rgba(16, 185, 129, 0.03) 0%, transparent 60%);
+            background-attachment: fixed;
+            padding-bottom: 60px;
+        }
+
+        .container {
+            max-width: 1440px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        /* Top Header */
+        header {
+            border-bottom: 1px solid var(--border-color);
+            background: rgba(8, 12, 20, 0.85);
+            backdrop-filter: blur(16px);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            padding: 16px 0;
+        }
+
+        .header-inner {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .brand-group {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .brand-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: var(--radius-md);
+            background: linear-gradient(135deg, #0284c7, #06b6d4, #10b981);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 20px rgba(6, 182, 212, 0.4);
+            color: white;
+            font-size: 22px;
+        }
+
+        .brand-text h1 {
+            font-size: 1.35rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            background: linear-gradient(90deg, #f8fafc, #38bdf8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .brand-text p {
+            font-size: 0.78rem;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .nasa-badge {
+            background: rgba(239, 68, 68, 0.15);
+            color: #f87171;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: 4px;
+            padding: 1px 6px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            letter-spacing: 0.04em;
+        }
+
+        .api-controls {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid var(--border-color);
+            padding: 6px 12px;
+            border-radius: var(--radius-md);
+        }
+
+        .connection-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.8rem;
+            font-family: var(--font-mono);
+        }
+
+        .status-dot {
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            background-color: var(--accent-rose);
+            box-shadow: 0 0 8px var(--accent-rose);
+            transition: all 0.3s ease;
+        }
+
+        .status-dot.connected {
+            background-color: var(--accent-emerald);
+            box-shadow: 0 0 8px var(--accent-emerald);
+        }
+
+        .api-input-wrap {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .api-input {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 6px 10px;
+            border-radius: var(--radius-sm);
+            font-size: 0.8rem;
+            font-family: var(--font-mono);
+            width: 190px;
+        }
+
+        .api-input:focus {
+            outline: none;
+            border-color: var(--accent-cyan);
+        }
+
+        .btn-sm {
+            background: #1e293b;
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+            padding: 6px 12px;
+            border-radius: var(--radius-sm);
+            font-size: 0.78rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-sm:hover {
+            background: #334155;
+            border-color: var(--accent-cyan);
+        }
+
+        .btn-tour {
+            background: linear-gradient(135deg, #8b5cf6, #06b6d4);
+            border: none;
+            color: white;
+            padding: 6px 14px;
+            border-radius: var(--radius-sm);
+            font-size: 0.78rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 0 12px rgba(139, 92, 246, 0.4);
+            transition: all 0.2s ease;
+        }
+
+        .btn-tour:hover {
+            opacity: 0.95;
+            transform: scale(1.02);
+        }
+
+        /* Section Layout */
+        section {
+            margin-top: 32px;
+        }
+
+        .section-header {
+            margin-bottom: 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .section-header h2 {
+            font-size: 1.15rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .section-header p {
+            font-size: 0.82rem;
+            color: var(--text-secondary);
+        }
+
+        /* Overview Stat Banner */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 18px;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.2s ease, border-color 0.2s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            border-color: var(--border-highlight);
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 6px;
+        }
+
+        .stat-value {
+            font-size: 1.6rem;
+            font-weight: 700;
+            font-family: var(--font-mono);
+            color: var(--text-primary);
+            display: flex;
+            align-items: baseline;
+            gap: 6px;
+        }
+
+        .stat-subtext {
+            font-size: 0.74rem;
+            color: var(--text-muted);
+            margin-top: 6px;
+        }
+
+        /* Eight Environmental Modules Grid */
+        .modules-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 16px;
+        }
+
+        .module-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 18px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: all 0.25s ease;
+            position: relative;
+        }
+
+        .module-card:hover {
+            border-color: var(--border-highlight);
+            background: var(--bg-card-hover);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+        }
+
+        .module-card-top {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .module-meta {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .module-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .module-title h3 {
+            font-size: 0.98rem;
+            font-weight: 600;
+            text-transform: capitalize;
+        }
+
+        .status-badge {
+            font-size: 0.68rem;
+            font-weight: 600;
+            padding: 3px 8px;
+            border-radius: 9999px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .badge-fully_working {
+            background: rgba(16, 185, 129, 0.15);
+            color: #34d399;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .badge-observation_only {
+            background: rgba(245, 158, 11, 0.15);
+            color: #fbbf24;
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+
+        .badge-historical_analysis {
+            background: rgba(59, 130, 246, 0.15);
+            color: #60a5fa;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+        }
+
+        .badge-unavailable {
+            background: rgba(244, 63, 94, 0.15);
+            color: #fb7185;
+            border: 1px solid rgba(244, 63, 94, 0.3);
+        }
+
+        .module-dataset {
+            font-size: 0.78rem;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            line-height: 1.4;
+        }
+
+        .module-daac {
+            font-size: 0.72rem;
+            font-family: var(--font-mono);
+            color: var(--accent-cyan);
+            margin-bottom: 12px;
+        }
+
+        .module-types {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            margin-bottom: 14px;
+        }
+
+        .type-pill {
+            font-size: 0.68rem;
+            padding: 2px 6px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 4px;
+            color: var(--text-muted);
+        }
+
+        .type-pill.active {
+            color: var(--text-primary);
+            border-color: rgba(56, 189, 248, 0.3);
+        }
+
+        .btn-select-mod {
+            width: 100%;
+            padding: 8px;
+            border-radius: var(--radius-sm);
+            background: rgba(6, 182, 212, 0.12);
+            border: 1px solid rgba(6, 182, 212, 0.3);
+            color: var(--accent-cyan);
+            font-size: 0.8rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-select-mod:hover {
+            background: var(--accent-cyan);
+            color: #000;
+        }
+
+        /* Interactive Studio Layout */
+        .studio-grid {
+            display: grid;
+            grid-template-columns: 380px 1fr;
+            gap: 24px;
+            margin-top: 16px;
+        }
+
+        @media (max-width: 1024px) {
+            .studio-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .control-panel {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+        }
+
+        .panel-title {
+            font-size: 0.95rem;
+            font-weight: 600;
+            margin-bottom: 14px;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Leaflet Map Card */
+        #map-container {
+            height: 200px;
+            width: 100%;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-color);
+            margin-bottom: 14px;
+            z-index: 10;
+        }
+
+        .map-hint {
+            font-size: 0.72rem;
+            color: var(--accent-cyan);
+            margin-top: -8px;
+            margin-bottom: 12px;
+            text-align: center;
+        }
+
+        .preset-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px;
+            margin-bottom: 14px;
+        }
+
+        .btn-preset {
+            background: #1e293b;
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            font-size: 0.72rem;
+            padding: 6px 8px;
+            border-radius: var(--radius-sm);
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .btn-preset:hover {
+            border-color: var(--accent-cyan);
+            color: var(--text-primary);
+            background: #334155;
+        }
+
+        .form-group {
+            margin-bottom: 14px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+        }
+
+        .input-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .form-control {
+            width: 100%;
+            background: rgba(15, 23, 42, 0.9);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            padding: 8px 10px;
+            color: var(--text-primary);
+            font-size: 0.82rem;
+            font-family: var(--font-mono);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--accent-cyan);
+            box-shadow: 0 0 0 2px var(--accent-cyan-glow);
+        }
+
+        select.form-control {
+            font-family: var(--font-main);
+        }
+
+        .action-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 18px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #0284c7, #06b6d4);
+            border: none;
+            color: white;
+            font-weight: 600;
+            padding: 10px;
+            border-radius: var(--radius-md);
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 14px rgba(6, 182, 212, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-primary:hover {
+            opacity: 0.95;
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: #1e293b;
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            font-weight: 500;
+            padding: 9px;
+            border-radius: var(--radius-md);
+            font-size: 0.82rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-secondary:hover {
+            background: #334155;
+            border-color: var(--accent-cyan);
+        }
+
+        /* Results / Display Panels */
+        .display-area {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 22px;
+        }
+
+        .card-header-flex {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .card-header-flex h3 {
+            font-size: 1.05rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .chart-wrap {
+            position: relative;
+            height: 320px;
+            width: 100%;
+        }
+
+        .provenance-strip {
+            margin-top: 16px;
+            padding: 12px;
+            background: rgba(0, 0, 0, 0.35);
+            border-left: 3px solid var(--accent-cyan);
+            border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+            font-size: 0.78rem;
+            color: var(--text-secondary);
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 8px;
+            align-items: center;
+        }
+
+        .provenance-item span {
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        .btn-worldview {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(14, 165, 233, 0.15);
+            border: 1px solid rgba(14, 165, 233, 0.4);
+            color: #38bdf8;
+            padding: 4px 10px;
+            border-radius: var(--radius-sm);
+            font-size: 0.72rem;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.15s ease;
+        }
+
+        .btn-worldview:hover {
+            background: #0284c7;
+            color: white;
+        }
+
+        /* Sonification Deck */
+        .sonification-deck {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+            gap: 10px;
+            margin-top: 14px;
+        }
+
+        .sonif-param-box {
+            background: rgba(15, 23, 42, 0.7);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 12px;
+            text-align: center;
+            transition: border-color 0.2s ease;
+        }
+
+        .sonif-param-box:hover {
+            border-color: var(--accent-violet);
+        }
+
+        .sonif-param-name {
+            font-size: 0.68rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 4px;
+        }
+
+        .sonif-param-val {
+            font-size: 1.25rem;
+            font-weight: 700;
+            font-family: var(--font-mono);
+            color: var(--accent-cyan);
+        }
+
+        .sonif-param-unit {
+            font-size: 0.66rem;
+            color: var(--text-secondary);
+        }
+
+        .player-bar {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-top: 16px;
+            padding: 12px 16px;
+            background: rgba(139, 92, 246, 0.1);
+            border: 1px solid rgba(139, 92, 246, 0.25);
+            border-radius: var(--radius-md);
+            flex-wrap: wrap;
+        }
+
+        .btn-play {
+            background: var(--accent-violet);
+            color: white;
+            border: none;
+            padding: 8px 18px;
+            border-radius: var(--radius-sm);
+            font-weight: 600;
+            font-size: 0.82rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s ease;
+        }
+
+        .btn-play:hover {
+            background: #7c3aed;
+        }
+
+        .pulse-visualizer {
+            flex: 1;
+            min-width: 140px;
+            height: 12px;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 6px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .pulse-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--accent-cyan), var(--accent-violet));
+            transition: width 0.1s linear;
+        }
+
+        .btn-export-json {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            font-size: 0.72rem;
+            padding: 6px 10px;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .btn-export-json:hover {
+            background: rgba(255, 255, 255, 0.12);
+            color: var(--text-primary);
+        }
+
+        /* Guided Tour Overlay Box */
+        .tour-story-box {
+            display: none;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, rgba(30, 27, 75, 0.8), rgba(15, 23, 42, 0.95));
+            border: 1px solid var(--accent-violet);
+            border-radius: var(--radius-lg);
+            padding: 18px;
+            box-shadow: 0 0 25px rgba(139, 92, 246, 0.25);
+            animation: fadeIn 0.3s ease;
+        }
+
+        .tour-story-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .tour-step-badge {
+            background: var(--accent-violet);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 9999px;
+            font-size: 0.7rem;
+            font-weight: 700;
+        }
+
+        /* Intelligence Narrative & Anomalies */
+        .narrative-box {
+            font-size: 0.92rem;
+            line-height: 1.6;
+            color: #e2e8f0;
+            padding: 14px 16px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: var(--radius-md);
+            margin-bottom: 16px;
+            border-left: 3px solid var(--accent-emerald);
+        }
+
+        .compound-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .compound-card {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 12px;
+        }
+
+        .compound-name {
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .compound-val {
+            font-size: 1.3rem;
+            font-weight: 700;
+            font-family: var(--font-mono);
+            color: var(--accent-amber);
+            margin-top: 4px;
+        }
+
+        .completeness-bar-wrap {
+            margin-bottom: 16px;
+        }
+
+        .completeness-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+        }
+
+        .completeness-track {
+            height: 6px;
+            background: #1e293b;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .completeness-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #06b6d4, #10b981);
+            transition: width 0.4s ease;
+        }
+
+        .anomalies-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.78rem;
+            margin-top: 10px;
+        }
+
+        .anomalies-table th {
+            text-align: left;
+            padding: 8px;
+            color: var(--text-muted);
+            border-bottom: 1px solid var(--border-color);
+            text-transform: uppercase;
+            font-size: 0.68rem;
+            letter-spacing: 0.05em;
+        }
+
+        .anomalies-table td {
+            padding: 8px;
+            border-bottom: 1px solid rgba(51, 65, 85, 0.3);
+            font-family: var(--font-mono);
+        }
+
+        .toast {
+            display: none;
+            padding: 10px 16px;
+            border-radius: var(--radius-md);
+            font-size: 0.82rem;
+            margin-bottom: 16px;
+        }
+
+        .toast.error {
+            display: block;
+            background: rgba(244, 63, 94, 0.15);
+            border: 1px solid rgba(244, 63, 94, 0.4);
+            color: #fca5a5;
+        }
+
+        .toast.info {
+            display: block;
+            background: rgba(6, 182, 212, 0.12);
+            border: 1px solid rgba(6, 182, 212, 0.3);
+            color: #7dd3fc;
+        }
+
+        .json-viewer {
+            display: none;
+            background: #020617;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 12px;
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            color: #38bdf8;
+            max-height: 260px;
+            overflow: auto;
+            white-space: pre-wrap;
+            margin-top: 12px;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        footer {
+            margin-top: 60px;
+            padding-top: 24px;
+            border-top: 1px solid var(--border-color);
+            text-align: center;
+            font-size: 0.78rem;
+            color: var(--text-muted);
+        }
+
+        footer a {
+            color: var(--accent-cyan);
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header Navigation -->
+    <header>
+        <div class="container header-inner">
+            <div class="brand-group">
+                <div class="brand-icon">🌍</div>
+                <div class="brand-text">
+                    <h1>EARTH JUKEBOX</h1>
+                    <p>NASA-Powered Environmental Intelligence & Sonification <span class="nasa-badge">STRICT NASA SOURCES</span></p>
+                </div>
+            </div>
+
+            <div class="api-controls">
+                <button class="btn-tour" onclick="startGuidedTour()">🚀 Play Guided NASA Tour</button>
+                <div class="connection-indicator">
+                    <span id="conn-dot" class="status-dot"></span>
+                    <span id="conn-text">Connecting...</span>
+                    <span id="conn-latency" style="color: var(--text-muted); font-size: 0.72rem;"></span>
+                </div>
+                <div class="api-input-wrap">
+                    <input type="text" id="api-base-url" class="api-input" value="http://127.0.0.1:8000" placeholder="API Base URL">
+                    <button id="btn-reconnect" class="btn-sm" onclick="initBackendConnection()">Connect</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+
+        <!-- Error/Status Toast -->
+        <div id="status-toast" class="toast"></div>
+
+        <!-- Guided Tour Story Banner -->
+        <div id="tour-box" class="tour-story-box">
+            <div class="tour-story-header">
+                <div>
+                    <span id="tour-badge" class="tour-step-badge">CASE STUDY 1 / 4</span>
+                    <strong id="tour-title" style="margin-left: 8px; color: var(--text-primary); font-size: 0.95rem;">Arctic Cryosphere Retreat</strong>
+                </div>
+                <button class="btn-sm" onclick="stopGuidedTour()">Close Tour</button>
+            </div>
+            <p id="tour-narrative" style="font-size: 0.85rem; color: #cbd5e1; line-height: 1.5;"></p>
+        </div>
+
+        <!-- Section B: Overview & Readiness Stats -->
+        <section id="overview-section">
+            <div class="section-header">
+                <div>
+                    <h2>Telemetry Overview</h2>
+                    <p>Real-time health status of Earth Jukebox analytical microservices.</p>
+                </div>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">Environmental Modules</div>
+                    <div class="stat-value"><span id="active-mod-count">8</span> <span style="font-size: 1rem; color: var(--text-muted);">/ 8</span></div>
+                    <div class="stat-subtext">Ocean, Fires, Rain, Ice, Storms, Veg, Wind, Temp</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-label">NASA Policy Verification</div>
+                    <div class="stat-value" style="color: var(--accent-emerald);" id="nasa-policy-stat">ENFORCED</div>
+                    <div class="stat-subtext">Zero 3rd-party substitution. Open Science.</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-label">Model Validation Strategy</div>
+                    <div class="stat-value" style="font-size: 1.25rem; color: var(--accent-cyan);">CHRONO 80/20</div>
+                    <div class="stat-subtext">Zero future leakage. Seasonal naive baselines.</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-label">Sonification Engine</div>
+                    <div class="stat-value" style="font-size: 1.25rem; color: var(--accent-violet);">HARMONIC SCALE</div>
+                    <div class="stat-subtext">Quantized cinematic pentatonic & dorian registers</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section C: Eight Environmental Modules -->
+        <section id="modules-section">
+            <div class="section-header">
+                <div>
+                    <h2>Eight Environmental Modules</h2>
+                    <p>Verified NASA satellite and reanalysis observation products.</p>
+                </div>
+            </div>
+
+            <div class="modules-grid" id="modules-container">
+                <div style="color: var(--text-muted); font-size: 0.85rem;">Loading NASA module specifications...</div>
+            </div>
+        </section>
+
+        <!-- Section D & G & F: Interactive Studio & Results -->
+        <section id="studio-section">
+            <div class="section-header">
+                <div>
+                    <h2>Location Analysis & Sonification Studio</h2>
+                    <p>Click anywhere on Earth or choose a preset to analyze verified NASA observations.</p>
+                </div>
+            </div>
+
+            <div class="studio-grid">
+                <!-- Left: Control Panel -->
+                <div class="control-panel">
+                    <div class="panel-title">📍 Interactive Earth Map & Coordinates</div>
+
+                    <!-- Leaflet Geospatial Map -->
+                    <div id="map-container"></div>
+                    <div class="map-hint">💡 Click anywhere on the map to set target coordinates</div>
+
+                    <div class="form-group">
+                        <label class="form-label">Demonstration Presets</label>
+                        <div class="preset-buttons">
+                            <button class="btn-preset" onclick="setPreset(19.0760, 72.8777, 'Mumbai (Monsoon Tropics)', 'rain')">🇮🇳 Mumbai (Rain)</button>
+                            <button class="btn-preset" onclick="setPreset(78.2232, 15.6267, 'Svalbard (Arctic Cryosphere)', 'ice')">🧊 Svalbard (Ice)</button>
+                            <button class="btn-preset" onclick="setPreset(-3.4653, -62.2159, 'Amazon Basin (Rainforest)', 'vegetation')">🌳 Amazon (Vegetation)</button>
+                            <button class="btn-preset" onclick="setPreset(0.0000, -140.0000, 'Equatorial Pacific (Ocean SST)', 'ocean')">🌊 Pacific (Ocean)</button>
+                            <button class="btn-preset" onclick="setPreset(34.0522, -118.2437, 'Los Angeles (Thermal/Fire)', 'fires')">🔥 S. California (Fires)</button>
+                            <button class="btn-preset" onclick="setPreset(51.5074, -0.1278, 'London (Temperate Climate)', 'temperature')">🇬🇧 London (Temp)</button>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Location Name</label>
+                        <input type="text" id="loc-name" class="form-control" value="Mumbai (Monsoon Tropics)">
+                    </div>
+
+                    <div class="form-group">
+                        <div class="input-row">
+                            <div>
+                                <label class="form-label">Latitude (-90 to 90)</label>
+                                <input type="number" step="0.0001" id="loc-lat" class="form-control" value="19.0760" onchange="updateMapMarker()">
+                            </div>
+                            <div>
+                                <label class="form-label">Longitude (-180 to 180)</label>
+                                <input type="number" step="0.0001" id="loc-lon" class="form-control" value="72.8777" onchange="updateMapMarker()">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Environmental Theme</label>
+                        <select id="sel-category" class="form-control">
+                            <option value="temperature">Temperature (POWER T2M)</option>
+                            <option value="rain" selected>Rain / Precipitation (POWER / GPM)</option>
+                            <option value="wind">Wind Velocity (POWER WS10M)</option>
+                            <option value="fires">Fires (FIRMS VIIRS Hotspots)</option>
+                            <option value="ocean">Ocean (GHRSST MUR SST)</option>
+                            <option value="ice">Ice / Cryosphere (NSIDC G02135)</option>
+                            <option value="storms">Storms (GPM IMERG Convective)</option>
+                            <option value="vegetation">Vegetation (MODIS NDVI / PAR)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="input-row">
+                            <div>
+                                <label class="form-label">Start Date</label>
+                                <input type="date" id="date-start" class="form-control" value="2020-01-01">
+                            </div>
+                            <div>
+                                <label class="form-label">End Date</label>
+                                <input type="date" id="date-end" class="form-control" value="2023-12-31">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Forecast Horizon: <span id="horizon-val" style="color: var(--accent-cyan); font-weight: 600;">12</span> months</label>
+                        <input type="range" id="range-horizon" min="1" max="24" value="12" style="width: 100%; accent-color: var(--accent-cyan);" oninput="document.getElementById('horizon-val').innerText = this.value">
+                    </div>
+
+                    <div class="action-buttons">
+                        <button id="btn-predict" class="btn-primary" onclick="executeAnalysis()">
+                            <span id="btn-predict-spinner" style="display: none;" class="spinner"></span>
+                            Analyze & Predict
+                        </button>
+                        <button class="btn-secondary" onclick="executeIntelligence()">Synthesize Environmental Intelligence</button>
+                        <button class="btn-secondary" onclick="toggleRawJson()">Toggle Raw API Payload</button>
+                    </div>
+                </div>
+
+                <!-- Right: Visualization & Sonification Display Area -->
+                <div class="display-area">
+                    <!-- Chart Visualizer Card -->
+                    <div class="card">
+                        <div class="card-header-flex">
+                            <div>
+                                <h3 id="chart-title">Observation & Forecasting Trajectory</h3>
+                                <p id="chart-subtitle" style="font-size: 0.75rem; color: var(--text-secondary);">Historical NASA observations with empirical residual uncertainty bounds.</p>
+                            </div>
+                            <div id="result-type-badge-slot"></div>
+                        </div>
+
+                        <div class="chart-wrap">
+                            <canvas id="envChart"></canvas>
+                        </div>
+
+                        <!-- Data Provenance Strip -->
+                        <div class="provenance-strip" id="provenance-box">
+                            <div class="provenance-item">Source: <span id="prov-source">NASA POWER Climatology</span></div>
+                            <div class="provenance-item">DAAC: <span id="prov-daac">NASA Langley ASDC</span></div>
+                            <div class="provenance-item">Resolution: <span id="prov-res">0.5 x 0.625 degrees</span></div>
+                            <div class="provenance-item">Model: <span id="prov-model">Autoregressive Ridge</span></div>
+                            <div>
+                                <a id="btn-worldview-link" href="#" target="_blank" class="btn-worldview" style="display: none;">
+                                    <span>🛰️</span> View on NASA Worldview
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Sonification Parameters Card -->
+                    <div class="card">
+                        <div class="card-header-flex">
+                            <div>
+                                <h3>🎵 Harmonic Sonification Engine</h3>
+                                <p id="sonif-desc" style="font-size: 0.78rem; color: var(--text-secondary);">Continuous physical variables quantized to resonant harmonic scales.</p>
+                            </div>
+                            <div style="display: flex; gap: 6px; align-items: center;">
+                                <span id="sonif-scale-badge" class="status-badge badge-historical_analysis">Pentatonic Minor</span>
+                                <span id="sonif-profile-badge" class="status-badge badge-fully_working">Harmonic Scale Ready</span>
+                            </div>
+                        </div>
+
+                        <!-- Telemetry Grid -->
+                        <div class="sonification-deck">
+                            <div class="sonif-param-box">
+                                <div class="sonif-param-name">Musical Note</div>
+                                <div class="sonif-param-val" id="p-note" style="color: var(--accent-violet);">--</div>
+                                <div class="sonif-param-unit">Scale Degree</div>
+                            </div>
+                            <div class="sonif-param-box">
+                                <div class="sonif-param-name">Pitch Frequency</div>
+                                <div class="sonif-param-val" id="p-hz">--</div>
+                                <div class="sonif-param-unit">Hertz (Hz)</div>
+                            </div>
+                            <div class="sonif-param-box">
+                                <div class="sonif-param-name">MIDI Register</div>
+                                <div class="sonif-param-val" id="p-midi">--</div>
+                                <div class="sonif-param-unit">Note 0–127</div>
+                            </div>
+                            <div class="sonif-param-box">
+                                <div class="sonif-param-name">Sound Pressure</div>
+                                <div class="sonif-param-val" id="p-vol">--</div>
+                                <div class="sonif-param-unit">Decibels (dB)</div>
+                            </div>
+                            <div class="sonif-param-box">
+                                <div class="sonif-param-name">Cadence Tempo</div>
+                                <div class="sonif-param-val" id="p-bpm">--</div>
+                                <div class="sonif-param-unit">BPM</div>
+                            </div>
+                            <div class="sonif-param-box">
+                                <div class="sonif-param-name">Rhythm Density</div>
+                                <div class="sonif-param-val" id="p-rhythm">--</div>
+                                <div class="sonif-param-unit">Subdivision</div>
+                            </div>
+                            <div class="sonif-param-box">
+                                <div class="sonif-param-name">Brightness / Int.</div>
+                                <div class="sonif-param-val" id="p-intensity">--</div>
+                                <div class="sonif-param-unit">Harmonic Factor</div>
+                            </div>
+                        </div>
+
+                        <!-- Audition Player Bar -->
+                        <div class="player-bar">
+                            <button id="btn-audio-play" class="btn-play" onclick="auditionSonification()">
+                                <span>▶</span> Audition Ambient Sonification
+                            </button>
+                            <div class="pulse-visualizer">
+                                <div id="audio-pulse-bar" class="pulse-bar"></div>
+                            </div>
+                            <span id="audio-status-label" style="font-size: 0.75rem; font-family: var(--font-mono); color: var(--text-muted);">Idle</span>
+                            <button class="btn-export-json" onclick="exportSonificationJson()">💾 Export Parameters (JSON)</button>
+                        </div>
+                    </div>
+
+                    <!-- Raw JSON Viewer -->
+                    <pre id="json-viewer" class="json-viewer"></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section E: Environmental Intelligence Layer Synthesis -->
+        <section id="intelligence-section">
+            <div class="section-header">
+                <div>
+                    <h2>Environmental Intelligence Layer</h2>
+                    <p>Cross-thematic synthesis across all eight NASA environmental indicators.</p>
+                </div>
+                <button class="btn-sm" onclick="executeIntelligence()">Run Synthesis</button>
+            </div>
+
+            <div class="card">
+                <div class="completeness-bar-wrap">
+                    <div class="completeness-label">
+                        <span>Data Completeness Ratio</span>
+                        <span id="intel-ratio-pct" style="font-family: var(--font-mono); color: var(--accent-emerald);">0%</span>
+                    </div>
+                    <div class="completeness-track">
+                        <div id="intel-progress-bar" class="completeness-fill"></div>
+                    </div>
+                </div>
+
+                <div class="narrative-box" id="intel-narrative">
+                    Click "Run Synthesis" or "Synthesize Environmental Intelligence" to run an automated cross-module assessment for the selected geographic location.
+                </div>
+
+                <!-- Compound Climate Indices -->
+                <div class="compound-grid" id="compound-indices-wrap" style="display: none;">
+                    <div class="compound-card">
+                        <div class="compound-name">Evaporative Aridity Ratio</div>
+                        <div class="compound-val" id="idx-aridity">--</div>
+                        <div style="font-size: 0.68rem; color: var(--text-muted); margin-top: 2px;">Temperature &divide; Precipitation</div>
+                    </div>
+                    <div class="compound-card">
+                        <div class="compound-name">Convective Storm Index</div>
+                        <div class="compound-val" id="idx-storm">--</div>
+                        <div style="font-size: 0.68rem; color: var(--text-muted); margin-top: 2px;">Wind Velocity &times; Peak Rain</div>
+                    </div>
+                </div>
+
+                <h4 style="font-size: 0.85rem; margin-top: 18px; margin-bottom: 8px; color: var(--text-secondary);">Statistical Anomalies Detected (>2 Sigma Threshold)</h4>
+                <div style="overflow-x: auto;">
+                    <table class="anomalies-table">
+                        <thead>
+                            <tr>
+                                <th>Category</th>
+                                <th>Timestamp</th>
+                                <th>Observation</th>
+                                <th>Historical Mean</th>
+                                <th>Unit</th>
+                                <th>Deviation</th>
+                            </tr>
+                        </thead>
+                        <tbody id="anomalies-body">
+                            <tr>
+                                <td colspan="6" style="color: var(--text-muted); text-align: center; padding: 14px;">No anomalies flagged yet. Run intelligence synthesis.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer>
+        <div class="container">
+            <p><strong>Earth Jukebox</strong> — NASA Space Apps Challenge Environmental Intelligence Platform</p>
+            <p style="margin-top: 6px;">
+                Verified NASA Missions: CERES &bull; MERRA-2 &bull; GPM &bull; VIIRS &bull; MODIS &bull; GHRSST &bull; NSIDC Sea Ice Index.
+            </p>
+            <p style="margin-top: 4px; color: var(--text-muted);">
+                Compliant with NASA Open Data Policy. Zero third-party environmental data substitution.
+            </p>
+        </div>
+    </footer>
+
+    <!-- Frontend Interactive Logic -->
+    <script>
+        // State
+        let apiBaseUrl = "http://127.0.0.1:8000";
+        if (window.location.protocol.startsWith("http")) {
+            apiBaseUrl = window.location.origin;
+            document.getElementById("api-base-url").value = apiBaseUrl;
+        }
+
+        let currentChart = null;
+        let activeSonificationSeries = null;
+        let lastApiResponse = null;
+        let audioCtx = null;
+        let isPlayingAudio = false;
+
+        // Leaflet Map state
+        let earthMap = null;
+        let mapMarker = null;
+
+        // Guided Tour Data
+        const TOUR_STEPS = [
+            {
+                title: "Arctic Cryosphere: Svalbard (78.22°N, 15.63°E)",
+                lat: 78.2232,
+                lon: 15.6267,
+                name: "Svalbard (Polar Cryosphere)",
+                category: "ice",
+                narrative: "Step 1 of 4: The Arctic Cryosphere. Notice how the backend strictly enforces geographical polar boundaries (|lat| >= 60°). Sea ice index measurements from NSIDC DAAC translate into crystalline, sparse, long-decay chime parameters."
+            },
+            {
+                title: "Amazon Rainforest: Photosynthetic Seasonality (-3.47°S, -62.22°W)",
+                lat: -3.4653,
+                lon: -62.2159,
+                name: "Amazon Basin (Tropical Rainforest)",
+                category: "vegetation",
+                narrative: "Step 2 of 4: The Amazon Basin. Ingests NASA MODIS NDVI vegetation indices and Photosynthetically Active Radiation (PAR) from MERRA-2. Mapped to biophilic drone pads and rich Lydian harmonic scale registers."
+            },
+            {
+                title: "South Asian Monsoon: Mumbai (19.08°N, 72.88°E)",
+                lat: 19.0760,
+                lon: 72.8777,
+                name: "Mumbai (Monsoon Tropics)",
+                category: "rain",
+                narrative: "Step 3 of 4: The South Asian Monsoon. Highlights extreme precipitation seasonality (GPM IMERG-calibrated). Demonstrates our chronological validation and non-negative physical bounds."
+            },
+            {
+                title: "Active Thermal Hotspots: Southern California (34.05°N, -118.24°W)",
+                lat: 34.0522,
+                lon: -118.2437,
+                name: "Southern California (Active Fire Zone)",
+                category: "fires",
+                narrative: "Step 4 of 4: Thermal Anomalies & Wildfires. Illustrates our strict scientific guardrails: NASA FIRMS VIIRS detections are capped at near-real-time observations, strictly preventing synthetic forward fire predictions."
+            }
+        ];
+        let currentTourIdx = 0;
+        let isTourRunning = false;
+
+        window.addEventListener("DOMContentLoaded", () => {
+            initBackendConnection();
+            initChart();
+            initLeafletMap();
+        });
+
+        // 1. Initialize Interactive Leaflet Map with CartoDB Dark Matter tiles
+        function initLeafletMap() {
+            const initialLat = parseFloat(document.getElementById("loc-lat").value) || 19.0760;
+            const initialLon = parseFloat(document.getElementById("loc-lon").value) || 72.8777;
+
+            earthMap = L.map('map-container', {
+                center: [initialLat, initialLon],
+                zoom: 3,
+                zoomControl: false,
+                attributionControl: false
+            });
+
+            // Dark basemap
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+                maxZoom: 18,
+                subdomains: 'abcd',
+            }).addTo(earthMap);
+
+            // Pulsing cyan marker
+            const customIcon = L.divIcon({
+                className: 'custom-pin',
+                html: '<div style="width: 14px; height: 14px; background: #06b6d4; border: 2px solid white; border-radius: 50%; box-shadow: 0 0 14px #06b6d4;"></div>',
+                iconSize: [14, 14],
+                iconAnchor: [7, 7]
+            });
+
+            mapMarker = L.marker([initialLat, initialLon], { icon: customIcon }).addTo(earthMap);
+
+            // Click-to-Coordinate feature
+            earthMap.on('click', (e) => {
+                const lat = parseFloat(e.latlng.lat.toFixed(4));
+                const lon = parseFloat(e.latlng.lng.toFixed(4));
+                document.getElementById("loc-lat").value = lat;
+                document.getElementById("loc-lon").value = lon;
+                document.getElementById("loc-name").value = `Coordinates (${lat}, ${lon})`;
+                mapMarker.setLatLng([lat, lon]);
+                executeAnalysis();
+            });
+        }
+
+        function updateMapMarker() {
+            const lat = parseFloat(document.getElementById("loc-lat").value);
+            const lon = parseFloat(document.getElementById("loc-lon").value);
+            if (!isNaN(lat) && !isNaN(lon) && earthMap && mapMarker) {
+                mapMarker.setLatLng([lat, lon]);
+                earthMap.panTo([lat, lon], { animate: true });
+            }
+        }
+
+        // 2. Backend Connection Check & Module Discovery
+        async function initBackendConnection() {
+            apiBaseUrl = document.getElementById("api-base-url").value.trim().replace(/\/$/, "");
+            const dot = document.getElementById("conn-dot");
+            const text = document.getElementById("conn-text");
+            const lat = document.getElementById("conn-latency");
+
+            text.innerText = "Connecting...";
+            dot.className = "status-dot";
+
+            const t0 = performance.now();
+            try {
+                const res = await fetch(`${apiBaseUrl}/health`, { method: "GET" });
+                const t1 = performance.now();
+                if (res.ok) {
+                    const data = await res.json();
+                    dot.className = "status-dot connected";
+                    text.innerText = "Connected";
+                    lat.innerText = `(${Math.round(t1 - t0)}ms)`;
+                    document.getElementById("nasa-policy-stat").innerText = data.nasa_policy_compliance || "STRICT_NASA_ONLY";
+                    loadModules();
+                } else {
+                    throw new Error(`HTTP ${res.status}`);
+                }
+            } catch (err) {
+                dot.className = "status-dot";
+                text.innerText = "Offline";
+                lat.innerText = "";
+                showToast(`Unable to connect to Earth Jukebox backend at ${apiBaseUrl}. Ensure uvicorn is running.`, "error");
+            }
+        }
+
+        // 3. Load 8 Environmental Modules
+        async function loadModules() {
+            try {
+                const res = await fetch(`${apiBaseUrl}/modules`);
+                if (!res.ok) return;
+                const modules = await res.json();
+                renderModules(modules);
+                document.getElementById("active-mod-count").innerText = modules.length;
+            } catch (e) {
+                console.error("Module discovery error:", e);
+            }
+        }
+
+        function renderModules(modules) {
+            const container = document.getElementById("modules-container");
+            container.innerHTML = "";
+
+            const iconMap = {
+                temperature: "🌡️",
+                rain: "🌧️",
+                wind: "💨",
+                fires: "🔥",
+                ocean: "🌊",
+                ice: "🧊",
+                storms: "⛈️",
+                vegetation: "🌿"
+            };
+
+            modules.forEach(m => {
+                const card = document.createElement("div");
+                card.className = "module-card";
+
+                const badgeClass = `badge-${m.operational_status}`;
+                const icon = iconMap[m.category] || "🛰️";
+
+                card.innerHTML = `
+                    <div>
+                        <div class="module-card-top">
+                            <div class="module-meta">
+                                <div class="module-icon">${icon}</div>
+                                <div class="module-title">
+                                    <h3>${m.category}</h3>
+                                </div>
+                            </div>
+                            <span class="status-badge ${badgeClass}">${m.operational_status.replace('_', ' ')}</span>
+                        </div>
+                        <div class="module-dataset">${m.dataset_name}</div>
+                        <div class="module-daac">${m.provider_daac}</div>
+                        <div class="module-types">
+                            ${m.supported_result_types.map(t => `<span class="type-pill ${t === 'forecast' ? 'active' : ''}">${t}</span>`).join('')}
+                        </div>
+                    </div>
+                    <button class="btn-select-mod" onclick="selectModuleFromCard('${m.category}')">Analyze ${m.category.toUpperCase()}</button>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function selectModuleFromCard(category) {
+            document.getElementById("sel-category").value = category;
+            document.getElementById("studio-section").scrollIntoView({ behavior: 'smooth' });
+            executeAnalysis();
+        }
+
+        // 4. Preset Coordinator
+        function setPreset(lat, lon, name, cat) {
+            document.getElementById("loc-lat").value = lat;
+            document.getElementById("loc-lon").value = lon;
+            document.getElementById("loc-name").value = name;
+            if (cat) document.getElementById("sel-category").value = cat;
+            updateMapMarker();
+            executeAnalysis();
+        }
+
+        // 5. Guided Story Tour Feature
+        function startGuidedTour() {
+            isTourRunning = true;
+            currentTourIdx = 0;
+            document.getElementById("tour-box").style.display = "block";
+            runTourStep();
+        }
+
+        function stopGuidedTour() {
+            isTourRunning = false;
+            document.getElementById("tour-box").style.display = "none";
+        }
+
+        function runTourStep() {
+            if (!isTourRunning || currentTourIdx >= TOUR_STEPS.length) {
+                stopGuidedTour();
+                return;
+            }
+
+            const step = TOUR_STEPS[currentTourIdx];
+            document.getElementById("tour-badge").innerText = `CASE STUDY ${currentTourIdx + 1} / ${TOUR_STEPS.length}`;
+            document.getElementById("tour-title").innerText = step.title;
+            document.getElementById("tour-narrative").innerText = step.narrative;
+
+            setPreset(step.lat, step.lon, step.name, step.category);
+
+            // Audition sonification after response finishes
+            setTimeout(() => {
+                if (isTourRunning) {
+                    auditionSonification();
+                }
+            }, 1200);
+
+            // Advance step every 11 seconds
+            currentTourIdx++;
+            if (currentTourIdx < TOUR_STEPS.length) {
+                setTimeout(runTourStep, 11000);
+            } else {
+                setTimeout(() => {
+                    if (isTourRunning) {
+                        showToast("Guided NASA Tour Complete. Feel free to explore custom coordinates!", "info");
+                        stopGuidedTour();
+                    }
+                }, 11000);
+            }
+        }
+
+        // 6. Chart.js Initialization
+        function initChart() {
+            const ctx = document.getElementById("envChart").getContext("2d");
+            currentChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [
+                        {
+                            label: 'NASA Observations',
+                            data: [],
+                            borderColor: '#38bdf8',
+                            backgroundColor: 'rgba(56, 189, 248, 0.12)',
+                            fill: true,
+                            tension: 0.3,
+                            borderWidth: 2,
+                            pointRadius: 2.5,
+                        },
+                        {
+                            label: 'Prediction Trajectory',
+                            data: [],
+                            borderColor: '#34d399',
+                            borderDash: [5, 5],
+                            tension: 0.3,
+                            borderWidth: 2,
+                            pointRadius: 3,
+                        },
+                        {
+                            label: 'Upper 95% Bound',
+                            data: [],
+                            borderColor: 'rgba(52, 211, 153, 0.25)',
+                            borderDash: [2, 2],
+                            fill: false,
+                            pointRadius: 0,
+                        },
+                        {
+                            label: 'Lower 95% Bound',
+                            data: [],
+                            borderColor: 'rgba(52, 211, 153, 0.25)',
+                            borderDash: [2, 2],
+                            fill: '-1',
+                            backgroundColor: 'rgba(52, 211, 153, 0.08)',
+                            pointRadius: 0,
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: { color: '#94a3b8', font: { family: 'Inter', size: 11 } }
+                        },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false,
+                            backgroundColor: 'rgba(15, 23, 42, 0.95)',
+                            titleColor: '#f8fafc',
+                            bodyColor: '#cbd5e1',
+                            borderColor: '#334155',
+                            borderWidth: 1
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: { color: 'rgba(51, 65, 85, 0.3)' },
+                            ticks: { color: '#64748b', font: { family: 'JetBrains Mono', size: 10 }, maxRotation: 45 }
+                        },
+                        y: {
+                            grid: { color: 'rgba(51, 65, 85, 0.3)' },
+                            ticks: { color: '#64748b', font: { family: 'JetBrains Mono', size: 10 } }
+                        }
+                    }
+                }
+            });
+        }
+
+        // 7. Execute Analysis & Prediction
+        async function executeAnalysis() {
+            const category = document.getElementById("sel-category").value;
+            const lat = parseFloat(document.getElementById("loc-lat").value);
+            const lon = parseFloat(document.getElementById("loc-lon").value);
+            const startDate = document.getElementById("date-start").value;
+            const endDate = document.getElementById("date-end").value;
+            const horizon = parseInt(document.getElementById("range-horizon").value);
+
+            if (isNaN(lat) || lat < -90 || lat > 90) {
+                showToast("Latitude must be between -90 and 90.", "error");
+                return;
+            }
+            if (isNaN(lon) || lon < -180 || lon > 180) {
+                showToast("Longitude must be between -180 and 180.", "error");
+                return;
+            }
+            if (startDate > endDate) {
+                showToast("Start date must be chronologically before end date.", "error");
+                return;
+            }
+
+            const spinner = document.getElementById("btn-predict-spinner");
+            spinner.style.display = "inline-block";
+            hideToast();
+
+            try {
+                const payload = {
+                    category: category,
+                    latitude: lat,
+                    longitude: lon,
+                    start_date: startDate,
+                    end_date: endDate,
+                    horizon: horizon
+                };
+
+                const res = await fetch(`${apiBaseUrl}/predict`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await res.json();
+                lastApiResponse = data;
+
+                if (!res.ok) {
+                    throw new Error(data.message || data.detail || "Analysis request failed.");
+                }
+
+                updateDashboardWithResult(data);
+                showToast(`Analysis completed successfully for ${category.toUpperCase()}. Result: ${data.result_type}`, "info");
+
+            } catch (err) {
+                showToast(err.message, "error");
+                console.error("Execution error:", err);
+            } finally {
+                spinner.style.display = "none";
+            }
+        }
+
+        // 8. Update Dashboard with API Response
+        function updateDashboardWithResult(data) {
+            // A. Result Type Badge
+            const badgeSlot = document.getElementById("result-type-badge-slot");
+            const badgeMap = {
+                forecast: "badge-fully_working",
+                observation: "badge-observation_only",
+                historical_analysis: "badge-historical_analysis",
+                unavailable: "badge-unavailable",
+                projection: "badge-historical_analysis"
+            };
+            badgeSlot.innerHTML = `<span class="status-badge ${badgeMap[data.result_type] || 'badge-observation_only'}">${data.result_type.toUpperCase()}</span>`;
+
+            // B. Chart Updates
+            const historical = data.historical_data || [];
+            const predictions = data.predictions || [];
+
+            const histLabels = historical.map(p => p.timestamp);
+            const histValues = historical.map(p => p.value);
+
+            const predLabels = predictions.map(p => p.timestamp);
+            const predValues = predictions.map(p => p.value);
+            const upperBounds = predictions.map(p => p.upper_bound);
+            const lowerBounds = predictions.map(p => p.lower_bound);
+
+            const allLabels = [...histLabels, ...predLabels];
+            const paddedPredValues = [...Array(histLabels.length).fill(null), ...predValues];
+            const paddedUpper = [...Array(histLabels.length).fill(null), ...upperBounds];
+            const paddedLower = [...Array(histLabels.length).fill(null), ...lowerBounds];
+            const paddedHistValues = [...histValues, ...Array(predLabels.length).fill(null)];
+
+            currentChart.data.labels = allLabels;
+            currentChart.data.datasets[0].data = paddedHistValues;
+            currentChart.data.datasets[0].label = `Observations (${data.unit})`;
+            currentChart.data.datasets[1].data = paddedPredValues;
+            currentChart.data.datasets[1].label = `Prediction (${data.unit})`;
+            currentChart.data.datasets[2].data = paddedUpper;
+            currentChart.data.datasets[3].data = paddedLower;
+            currentChart.update();
+
+            document.getElementById("chart-title").innerText = `${data.condition.toUpperCase()} — ${data.result_type.replace('_', ' ').toUpperCase()}`;
+            document.getElementById("chart-subtitle").innerText = `${data.data_source.dataset_name} | Unit: ${data.unit}`;
+
+            // C. Provenance Strip & NASA Worldview Link
+            document.getElementById("prov-source").innerText = data.data_source.dataset_name;
+            document.getElementById("prov-daac").innerText = data.data_source.provider_daac;
+            document.getElementById("prov-res").innerText = data.data_source.spatial_resolution;
+            document.getElementById("prov-model").innerText = data.model ? `${data.model.name} (${data.model.validation_method})` : "Observation Baseline (No Forecast)";
+
+            const wvBtn = document.getElementById("btn-worldview-link");
+            if (data.nasa_worldview_url) {
+                wvBtn.href = data.nasa_worldview_url;
+                wvBtn.style.display = "inline-flex";
+            } else {
+                wvBtn.style.display = "none";
+            }
+
+            // D. Sonification Parameters
+            if (data.sonification && data.sonification.parameters.length > 0) {
+                activeSonificationSeries = data.sonification;
+                const params = data.sonification.parameters;
+                const latest = params[params.length - 1];
+
+                document.getElementById("sonif-desc").innerText = data.sonification.mapping_description;
+                document.getElementById("sonif-scale-badge").innerText = `${data.sonification.scale_mode.replace('_', ' ')} (Key ${data.sonification.musical_key})`;
+                document.getElementById("p-note").innerText = latest.musical_note || "--";
+                document.getElementById("p-hz").innerText = `${latest.pitch_hz} Hz`;
+                document.getElementById("p-midi").innerText = latest.midi_note;
+                document.getElementById("p-vol").innerText = `${latest.volume_db} dB`;
+                document.getElementById("p-bpm").innerText = latest.tempo_bpm;
+                document.getElementById("p-rhythm").innerText = latest.rhythm_density;
+                document.getElementById("p-intensity").innerText = latest.intensity;
+            } else {
+                activeSonificationSeries = null;
+                document.getElementById("p-note").innerText = "--";
+                document.getElementById("p-hz").innerText = "--";
+                document.getElementById("p-midi").innerText = "--";
+                document.getElementById("p-vol").innerText = "--";
+                document.getElementById("p-bpm").innerText = "--";
+                document.getElementById("p-rhythm").innerText = "--";
+                document.getElementById("p-intensity").innerText = "--";
+            }
+        }
+
+        // 9. Synthesize Environmental Intelligence
+        async function executeIntelligence() {
+            const lat = parseFloat(document.getElementById("loc-lat").value);
+            const lon = parseFloat(document.getElementById("loc-lon").value);
+            const startDate = document.getElementById("date-start").value;
+            const endDate = document.getElementById("date-end").value;
+            const locName = document.getElementById("loc-name").value;
+
+            try {
+                showToast("Synthesizing multi-module environmental intelligence...", "info");
+                const res = await fetch(`${apiBaseUrl}/intelligence/analyze`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        latitude: lat,
+                        longitude: lon,
+                        start_date: startDate,
+                        end_date: endDate,
+                        location_name: locName
+                    })
+                });
+
+                const data = await res.json();
+                lastApiResponse = data;
+
+                if (!res.ok) throw new Error(data.message || "Synthesis failed.");
+
+                // Render Narrative
+                document.getElementById("intel-narrative").innerText = data.unified_narrative;
+                const ratioPct = Math.round(data.data_completeness_ratio * 100);
+                document.getElementById("intel-ratio-pct").innerText = `${ratioPct}%`;
+                document.getElementById("intel-progress-bar").style.width = `${ratioPct}%`;
+
+                // Render Compound Indices
+                const compoundWrap = document.getElementById("compound-indices-wrap");
+                if (data.compound_indices && Object.keys(data.compound_indices).length > 0) {
+                    compoundWrap.style.display = "grid";
+                    document.getElementById("idx-aridity").innerText = data.compound_indices.evaporative_aridity_factor !== undefined ? data.compound_indices.evaporative_aridity_factor : "--";
+                    document.getElementById("idx-storm").innerText = data.compound_indices.convective_storm_index !== undefined ? data.compound_indices.convective_storm_index : "--";
+                } else {
+                    compoundWrap.style.display = "none";
+                }
+
+                // Render Anomalies Table
+                const tbody = document.getElementById("anomalies-body");
+                tbody.innerHTML = "";
+                if (data.anomalies_detected && data.anomalies_detected.length > 0) {
+                    data.anomalies_detected.forEach(a => {
+                        const tr = document.createElement("tr");
+                        tr.innerHTML = `
+                            <td style="color: var(--accent-cyan); font-weight: 600; text-transform: capitalize;">${a.category}</td>
+                            <td>${a.timestamp}</td>
+                            <td style="color: #f87171;">${a.value}</td>
+                            <td>${a.mean}</td>
+                            <td>${a.unit}</td>
+                            <td style="color: var(--accent-amber); font-weight: 600;">+${a.deviation} &sigma;</td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                } else {
+                    tbody.innerHTML = `<tr><td colspan="6" style="color: var(--text-muted); text-align: center; padding: 14px;">No anomalies exceeding 2-sigma variance detected.</td></tr>`;
+                }
+
+                document.getElementById("intelligence-section").scrollIntoView({ behavior: 'smooth' });
+                showToast("Environmental Intelligence synthesis completed successfully.", "info");
+
+            } catch (err) {
+                showToast(`Intelligence synthesis error: ${err.message}`, "error");
+            }
+        }
+
+        // 10. Ambient Harmonic Audio Player (Web Audio API with Rich Dual Oscillator & Filter)
+        function auditionSonification() {
+            if (!activeSonificationSeries || activeSonificationSeries.parameters.length === 0) {
+                showToast("No sonification parameters loaded. Run an analysis first.", "error");
+                return;
+            }
+
+            if (isPlayingAudio) return;
+
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+
+            isPlayingAudio = true;
+            const btn = document.getElementById("btn-audio-play");
+            const statusLabel = document.getElementById("audio-status-label");
+            const pulseBar = document.getElementById("audio-pulse-bar");
+
+            btn.innerText = "⏹ Playing Ambient...";
+            statusLabel.innerText = `Harmonic ${activeSonificationSeries.scale_mode.replace('_', ' ')} (${activeSonificationSeries.category.toUpperCase()})...`;
+
+            const params = activeSonificationSeries.parameters.slice(-12);
+            let idx = 0;
+
+            function playNext() {
+                if (idx >= params.length || !isPlayingAudio) {
+                    isPlayingAudio = false;
+                    btn.innerText = "▶ Audition Ambient Sonification";
+                    statusLabel.innerText = "Completed";
+                    pulseBar.style.width = "0%";
+                    return;
+                }
+
+                const pt = params[idx];
+                const freq = pt.pitch_hz;
+                const durSeconds = Math.min(0.65, pt.duration_ms / 1000.0);
+
+                // Update active metrics visually
+                document.getElementById("p-note").innerText = pt.musical_note || "--";
+                document.getElementById("p-hz").innerText = `${pt.pitch_hz} Hz`;
+                document.getElementById("p-midi").innerText = pt.midi_note;
+                document.getElementById("p-vol").innerText = `${pt.volume_db} dB`;
+                document.getElementById("p-bpm").innerText = pt.tempo_bpm;
+                document.getElementById("p-intensity").innerText = pt.intensity;
+
+                pulseBar.style.width = `${Math.round(((idx + 1) / params.length) * 100)}%`;
+
+                // Multi-timbre synthesizer sound design:
+                // Primary Oscillator
+                const osc1 = audioCtx.createOscillator();
+                // Sub-octave warm harmonic oscillator
+                const osc2 = audioCtx.createOscillator();
+                
+                // Resonant Lowpass Filter
+                const filter = audioCtx.createBiquadFilter();
+                filter.type = "lowpass";
+                filter.frequency.setValueAtTime(Math.min(3000, freq * 3.5), audioCtx.currentTime);
+                filter.Q.setValueAtTime(3.0, audioCtx.currentTime);
+
+                const gain = audioCtx.createGain();
+
+                osc1.type = pt.pitch_hz > 500 ? "triangle" : "sine";
+                osc1.frequency.setValueAtTime(freq, audioCtx.currentTime);
+
+                osc2.type = "sine";
+                osc2.frequency.setValueAtTime(freq / 2.0, audioCtx.currentTime); // 1 octave below for acoustic body
+
+                const volLinear = Math.pow(10, pt.volume_db / 20.0) * 0.35;
+                gain.gain.setValueAtTime(0.0001, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(Math.max(0.01, volLinear), audioCtx.currentTime + 0.04);
+                gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + durSeconds);
+
+                osc1.connect(filter);
+                osc2.connect(filter);
+                filter.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                osc1.start();
+                osc2.start();
+                osc1.stop(audioCtx.currentTime + durSeconds);
+                osc2.stop(audioCtx.currentTime + durSeconds);
+
+                idx++;
+                const delayMs = Math.max(260, (60000.0 / pt.tempo_bpm) * 0.65);
+                setTimeout(playNext, delayMs);
+            }
+
+            playNext();
+        }
+
+        // 11. Export Sonification Parameters as Downloadable JSON
+        function exportSonificationJson() {
+            if (!activeSonificationSeries) {
+                showToast("No sonification series available to export.", "error");
+                return;
+            }
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(activeSonificationSeries, null, 2));
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", `earth_jukebox_${activeSonificationSeries.category}_sonification.json`);
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+            showToast("Exported sonification parameters JSON file successfully.", "info");
+        }
+
+        // 12. Toast and JSON toggles
+        function showToast(msg, type = "info") {
+            const toast = document.getElementById("status-toast");
+            toast.className = `toast ${type}`;
+            toast.innerText = msg;
+        }
+
+        function hideToast() {
+            const toast = document.getElementById("status-toast");
+            toast.className = "toast";
+            toast.innerText = "";
+        }
+
+        function toggleRawJson() {
+            const viewer = document.getElementById("json-viewer");
+            if (viewer.style.display === "block") {
+                viewer.style.display = "none";
+            } else {
+                viewer.style.display = "block";
+                viewer.innerText = JSON.stringify(lastApiResponse || { message: "No API calls executed yet." }, null, 2);
+            }
+        }
+    </script>
+</body>
+</html>
