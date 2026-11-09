@@ -1,0 +1,47 @@
+{
+  "temperature": {
+    "category": "temperature",
+    "status": "evaluated",
+    "validation_method": "Chronological 80/20 Holdout",
+    "sample_size": 72,
+    "metrics": {
+      "mae": 0.83,
+      "rmse": 1.073,
+      "r2": 0.822,
+      "baseline_mae": 0.958
+    },
+    "beats_baseline": true,
+    "unit": "degrees_Celsius",
+    "data_source": "POWER Monthly Climate Surface Temperatures (CERES/MERRA-2)"
+  },
+  "rain": {
+    "category": "rain",
+    "status": "evaluated",
+    "validation_method": "Chronological 80/20 Holdout",
+    "sample_size": 72,
+    "metrics": {
+      "mae": 4.895,
+      "rmse": 7.284,
+      "r2": 0.677,
+      "baseline_mae": 2.376
+    },
+    "beats_baseline": false,
+    "unit": "mm/day",
+    "data_source": "POWER Corrected Precipitation (MERRA-2 / GPM Calibrated)"
+  },
+  "wind": {
+    "category": "wind",
+    "status": "evaluated",
+    "validation_method": "Chronological 80/20 Holdout",
+    "sample_size": 72,
+    "metrics": {
+      "mae": 0.386,
+      "rmse": 0.493,
+      "r2": 0.669,
+      "baseline_mae": 0.42
+    },
+    "beats_baseline": true,
+    "unit": "m/s",
+    "data_source": "POWER 10-Meter Wind Speed (MERRA-2 Assimilation)"
+  }
+}

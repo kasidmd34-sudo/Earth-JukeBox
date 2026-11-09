@@ -14,7 +14,12 @@ class Settings(BaseSettings):
     # NASA Credentials
     NASA_EARTHDATA_TOKEN: str = ""
     NASA_FIRMS_MAP_KEY: str = ""
-    
+
+    # Gemini AI - report summaries only
+    GEMINI_API_KEY: str = ""
+    GEMINI_MODEL: str = "gemini-3.8-flash"
+    GEMINI_TIMEOUT_SECONDS: float = 30.0
+
     # Storage & Network
     CACHE_DIR: str = "./data/cache"
     MODEL_ARTIFACTS_DIR: str = "./artifacts/models"

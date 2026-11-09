@@ -9,6 +9,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, HTMLResponse, JSONResponse
 from app.config import settings
 from app.data.nasa_client import nasa_client
+from app.reports.router import router as reports_router
 from app.api import (
     routes_health,
     routes_modules,
@@ -123,3 +124,4 @@ app.include_router(routes_sonification.router)
 app.include_router(routes_evaluation.router)
 app.include_router(routes_location.router)
 app.include_router(routes_metadata.router)
+app.include_router(reports_router)
