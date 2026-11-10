@@ -2,846 +2,705 @@
 
 ### Turning Earth's environmental data into intelligence — and intelligence into sound.
 
-[![NASA](https://img.shields.io/badge/Data-NASA-0B3D91?logo=nasa&logoColor=white)](https://www.nasa.gov/)
-[![Python](https://img.shields.io/badge/Python-3.11-3776AB?logo=python&logoColor=white)](https://www.python.org/)
-[![FastAPI](https://img.shields.io/badge/API-FastAPI-009688?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
-[![Machine Learning](https://img.shields.io/badge/AI-Machine%20Learning-orange)](https://scikit-learn.org/)
-[![NASA Space Apps](https://img.shields.io/badge/Event-NASA%20Space%20Apps%20Challenge-0B3D91)](https://www.spaceappschallenge.org/)
-
-**Earth Jukebox** is an environmental intelligence and sonification project that explores our planet through NASA Earth-observation data.
-
-It brings together environmental data ingestion, scientific analysis, machine learning, and sonification to transform complex measurements into meaningful insights and an interactive audio experience.
-
-The backend retrieves and processes NASA environmental data, performs supported analytical and predictive tasks, and exposes structured results through a FastAPI service. It also generates sonification parameters that a separate audio engine can use to translate environmental conditions into sound.
-
-> **Our vision:** Make the changing Earth easier to understand — not only through data and visualizations, but also through sound.
+[![Python](https://img.shields.io/badge/Python-3.11-blue.svg)](https://www.python.org/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-Backend-009688.svg)](https://fastapi.tiangolo.com/)
+[![NASA](https://img.shields.io/badge/Data-NASA%20Earth%20Observation-0B3D91.svg)](https://www.nasa.gov/)
+[![Machine Learning](https://img.shields.io/badge/Machine%20Learning-Enabled-orange.svg)](https://scikit-learn.org/)
+[![Project](https://img.shields.io/badge/Project-NASA%20Space%20Apps%20Challenge-1E90FF.svg)](https://www.spaceappschallenge.org/)
 
 ---
 
-## Table of Contents
+## 🌍 Overview
 
-- [Project Overview](#-project-overview)
-- [Project Goals](#-project-goals)
-- [System Architecture](#-system-architecture)
-- [Environmental Modules](#-environmental-modules)
-- [Technology Stack](#-technology-stack)
-- [NASA Data Sources and APIs](#-nasa-data-sources-and-apis)
-- [Data Policy and Scientific Integrity](#-data-policy-and-scientific-integrity)
-- [Repository Structure](#-repository-structure)
-- [Getting Started](#-getting-started)
-- [Configuration](#-configuration)
-- [Running the API](#-running-the-api)
-- [API Reference](#-api-reference)
-- [Example Workflow](#-example-workflow)
-- [Machine Learning and Evaluation](#-machine-learning-and-evaluation)
-- [Sonification Engine](#-sonification-engine)
-- [Interactive Demo](#-interactive-demo)
-- [Testing](#-testing)
-- [Scientific Limitations](#-scientific-limitations)
-- [Roadmap](#-roadmap)
-- [Contributing](#-contributing)
-- [Acknowledgements](#-acknowledgements)
+**Earth Jukebox** is an environmental intelligence and sonification platform that transforms environmental observations into meaningful insights and sound.
 
----
+The platform retrieves environmental data from configured Earth-observation sources, processes historical observations, performs statistical and machine-learning analysis where supported, and converts environmental patterns into sound.
 
-## Project Overview
+Users can explore different environmental conditions, examine historical data, listen to their corresponding sound representations, and generate downloadable PDF reports.
 
-Earth Jukebox explores eight interconnected environmental themes:
+The project aims to make environmental information more interactive, accessible, and engaging through the combination of:
 
-| Module | Environmental focus |
-|---|---|
-| 🌊 Ocean | Marine and oceanographic conditions |
-| 🔥 Fires | Satellite-based active fire observations |
-| 🌧️ Rain | Precipitation patterns and analysis |
-| ❄️ Ice | Cryosphere and sea-ice conditions |
-| 🌪️ Storms | Storm-related environmental observations |
-| 🌿 Vegetation | Vegetation health and seasonal changes |
-| 💨 Wind | Wind-speed observations and analysis |
-| 🌡️ Temperature | Surface and atmospheric temperature conditions |
+- Earth observation datasets
+- Python-based data processing
+- Machine learning
+- Statistical analysis
+- FastAPI
+- Data visualization
+- Audio sonification
+- AI-assisted explanations
+- PDF report generation
 
-Each module contributes environmental information to a shared **Environmental Intelligence Layer**.
+## 🎯 Project Objectives
 
-The resulting information can be used by the frontend for visualization and by the audio-generation component for environmental sonification.
+- Collect and process environmental observations from configured Earth-observation datasets.
+- Explore changes in environmental conditions over selected locations and time periods.
+- Apply statistical analysis and machine-learning techniques where appropriate.
+- Convert environmental measurements into sound using deterministic sonification parameters.
+- Present environmental observations through interactive visualizations.
+- Generate structured PDF reports containing observations, statistics, charts, data provenance, and limitations.
+- Improve public engagement with environmental data through an interactive experience.
 
-### What makes Earth Jukebox different?
+## 🌦️ Environmental Modules
 
-- **NASA-focused data:** Environmental information is sourced from NASA services and NASA-associated data archives selected for the project.
-- **Eight environmental dimensions:** Explore multiple aspects of Earth's changing systems.
-- **Scientific analysis:** Apply statistical and machine-learning methods where the available data supports them.
-- **Environmental intelligence:** Combine information from multiple environmental modules.
-- **Data-to-sound integration:** Translate measurements and analytical outputs into structured audio parameters.
-- **Scientific transparency:** Communicate data provenance, uncertainty, and limitations.
+Earth Jukebox currently supports eight environmental categories.
+
+| Module | Dataset / Data source | Main purpose |
+|---|---|---|
+| Temperature | NASA POWER Monthly Surface Temperature | Explore historical temperature patterns |
+| Rain | NASA POWER / GPM IMERG precipitation products | Examine precipitation patterns |
+| Wind | NASA POWER 10-Meter Wind Speed | Explore historical wind-speed variations |
+| Fires | NASA FIRMS VIIRS Active Fire Detections | Examine detected fire hotspots |
+| Vegetation | NASA MODIS MOD13 vegetation indices | Explore vegetation-index patterns |
+| Ocean | GHRSST MUR Sea Surface Temperature | Analyze historical sea-surface temperature |
+| Ice | NSIDC Sea Ice Index (G02135) | Examine polar sea-ice observations |
+| Storms | NASA GPM 3IMERGM precipitation product | Explore monthly precipitation patterns relevant to atmospheric conditions |
+
+**Note:** The availability of observations, historical analysis, and prediction differs by module. Not every module supports forecasting. The Storms module's configured GPM monthly precipitation product is not a cyclone-track or storm-intensity forecasting dataset.
 
 ---
 
-## Project Goals
+## 🛰️ Datasets, APIs and Official Data Sources
 
-Earth Jukebox aims to:
+This section provides the official websites, dataset pages, API documentation, and data portals associated with the environmental modules.
 
-1. Retrieve relevant environmental datasets from NASA sources.
-2. Preserve dataset provenance, units, timestamps, and spatial coverage.
-3. Analyze environmental conditions across eight themes.
-4. Apply statistical and machine-learning methods where scientifically appropriate.
-5. Provide consistent and documented API responses.
-6. Generate structured sonification parameters for the audio engine.
-7. Combine environmental information into meaningful intelligence.
-8. Communicate uncertainty and scientific limitations clearly.
+### 1. Temperature — NASA POWER
+
+**Dataset:** NASA POWER Monthly Climate Surface Temperatures  
+**Variable:** `T2M`  
+**Provider:** NASA Langley Atmospheric Science Data Center
+
+- [NASA POWER Portal](https://power.larc.nasa.gov/)
+- [NASA POWER Monthly Point API](https://power.larc.nasa.gov/api/temporal/monthly/point)
+- [NASA POWER Monthly API Documentation](https://power.larc.nasa.gov/docs/services/api/temporal/monthly/)
+
+The configured monthly point API provides gridded monthly temperature observations for a specified geographical location and time period.
+
+### 2. Rain — NASA POWER / GPM IMERG
+
+**Dataset:** NASA POWER precipitation and GPM IMERG products  
+**Provider:** NASA GES DISC / NASA Langley ASDC
+
+- [NASA POWER](https://power.larc.nasa.gov/)
+- [NASA GPM Data Directory](https://gpm.nasa.gov/data/directory)
+- [GPM 3IMERGM Dataset — NASA Earthdata](https://disc.gsfc.nasa.gov/datasets/GPM_3IMERGM_07/summary)
+
+These products support the examination of precipitation patterns. Monthly aggregated precipitation should not be interpreted as a real-time flash-flood warning.
+
+### 3. Wind — NASA POWER
+
+**Dataset:** NASA POWER 10-Meter Wind Speed  
+**Variable:** `WS10M`  
+**Provider:** NASA Langley Atmospheric Science Data Center
+
+- [NASA POWER Portal](https://power.larc.nasa.gov/)
+- [NASA POWER Monthly Point API](https://power.larc.nasa.gov/api/temporal/monthly/point)
+- [NASA POWER API Documentation](https://power.larc.nasa.gov/docs/services/api/temporal/monthly/)
+
+The configured wind variable represents gridded 10-meter wind-speed information. It should not be interpreted as a measurement of local wind gusts.
+
+### 4. Fires — NASA FIRMS
+
+**Dataset:** NASA FIRMS VIIRS Active Fire Detections  
+**Provider:** NASA LANCE / MODAPS
+
+- [NASA FIRMS Portal](https://firms.modaps.eosdis.nasa.gov/)
+- [NASA FIRMS API](https://firms.modaps.eosdis.nasa.gov/api/)
+- [FIRMS API Usage Documentation](https://firms.modaps.eosdis.nasa.gov/content/academy/data_api/firms_api_use.html)
+
+NASA FIRMS provides satellite-based active fire and thermal anomaly detections. These detections represent observed hotspots, not predictions of future fire ignition or spread.
+
+### 5. Vegetation — NASA MODIS
+
+**Dataset:** MODIS MOD13A2 / MOD13Q1 Vegetation Indices  
+**Provider:** NASA LP DAAC
+
+- [NASA MODIS Vegetation Indices](https://ladsweb.modaps.eosdis.nasa.gov/missions-and-measurements/science-domain/vegetation-indices/)
+- [MOD13Q1 Product Information](https://ladsweb.modaps.eosdis.nasa.gov/missions-and-measurements/products/MOD13Q1)
+- [NASA LP DAAC](https://lpdaac.usgs.gov/)
+
+MODIS vegetation-index products support the analysis of vegetation conditions using satellite-derived indices. Cloud cover and atmospheric effects can introduce gaps or uncertainty in observations.
+
+### 6. Ocean — GHRSST MUR
+
+**Dataset:** GHRSST Level 4 MUR Global Sea Surface Temperature  
+**Provider:** NASA PO.DAAC / OB.DAAC
+
+- [MUR Global Sea Surface Temperature Dataset](https://podaac.jpl.nasa.gov/dataset/MUR-JPL-L4-GLOB-v4.1)
+- [NASA PO.DAAC](https://podaac.jpl.nasa.gov/)
+- [NASA Earthdata Search](https://search.earthdata.nasa.gov/)
+
+The MUR dataset provides global sea-surface temperature information. Coastal areas can be affected by land-mask and spatial-resolution limitations.
+
+### 7. Ice — NSIDC Sea Ice Index
+
+**Dataset:** NSIDC Sea Ice Index (G02135), Version 4  
+**Provider:** National Snow and Ice Data Center (NSIDC)
+
+- [NSIDC Sea Ice Index — Dataset Information](https://nsidc.org/data/g02135/versions/4)
+- [NSIDC Sea Ice Index Data Archive](https://noaadata.apps.nsidc.org/NOAA/G02135/)
+- [NSIDC Sea Ice Index Viewer](https://nsidc.org/data/seaice_index)
+
+**Data-source clarification:** G02135 is an NSIDC dataset associated with NOAA@NSIDC. It should not be described as a dataset produced directly by NASA. Its inclusion should be considered separately when assessing strict NASA-only data-source compliance.
+
+### 8. Storms — NASA GPM
+
+**Dataset:** GPM 3IMERGM Monthly Precipitation  
+**Provider:** NASA GES DISC
+
+- [GPM 3IMERGM Dataset](https://disc.gsfc.nasa.gov/datasets/GPM_3IMERGM_07/summary)
+- [NASA GPM Data Directory](https://gpm.nasa.gov/data/directory)
+- [NASA GES DISC](https://disc.gsfc.nasa.gov/)
+
+The configured product contains monthly precipitation information. It can support historical precipitation analysis but does not provide cyclone tracks, storm trajectories, or storm-intensity forecasts.
+
+**Integration note:** The links above identify the official datasets, portals, and documentation associated with the modules. They do not necessarily represent the exact HTTP request URL used by every backend adapter. The exact request endpoints, parameters, and authentication requirements should be confirmed against the corresponding adapter implementation.
 
 ---
 
-## System Architecture
+## 🏗️ System Architecture
 
-The backend follows a modular data-processing architecture.
+Earth Jukebox follows a modular architecture in which the frontend communicates with a Python FastAPI backend.
 
 ```mermaid
 flowchart TD
-    A["NASA Data Sources"] --> B["Data Ingestion Layer"]
-    B --> C["Validation and Preprocessing"]
-    C --> D["Environmental Modules"]
+    A[User] --> B[Frontend Dashboard]
+    B --> C[FastAPI Backend]
 
-    D --> E["Environmental Intelligence Layer"]
-    E --> F["FastAPI Backend"]
+    C --> D[Observation Service]
+    C --> E[Sonification Service]
+    C --> F[Prediction Service]
+    C --> G[AI Intelligence Service]
+    C --> H[PDF Report Service]
 
-    E --> G["Sonification Parameter Engine"]
+    D --> I[NASA / Earth Observation Adapters]
+    I --> J[Environmental Datasets]
 
-    F --> H["Frontend and Visualizations"]
-    G --> I["Audio Generation Component"]
+    D --> K[Historical Observations]
+    K --> L[Statistics and Analysis]
+    L --> M[Visualization]
 
-    H --> J["Interactive Earth Experience"]
-    I --> J
+    K --> E
+    E --> N[Sonification Parameters]
+    N --> O[Frontend Web Audio API]
+
+    K --> F
+    F --> P[Supported Prediction Results]
+
+    K --> G
+    G --> Q[AI-Assisted Explanation]
+
+    K --> H
+    L --> H
+    M --> H
+    G --> H
+    H --> R[Downloadable PDF Report]
 ```
 
-### Core backend responsibilities
+### Architecture Components
 
-| Component | Responsibility |
-|---|---|
-| Data ingestion | Retrieve data from permitted NASA services |
-| Validation | Validate incoming data and coordinate/date parameters |
-| Preprocessing | Handle missing values, duplicates, and data formatting |
-| Environmental modules | Analyze the eight environmental themes |
-| Intelligence layer | Combine outputs from multiple modules |
-| ML layer | Perform supported statistical and predictive analysis |
-| FastAPI | Expose backend functionality through HTTP endpoints |
-| Sonification engine | Convert environmental outputs into acoustic parameters |
+**1. Frontend Dashboard**
 
-The frontend and audio-generation components can operate independently using the backend's documented API contracts.
+- Allows users to select an environmental category.
+- Accepts geographical coordinates and date ranges.
+- Supports browser-based location access.
+- Displays historical observations and charts.
+- Provides audio playback controls.
+- Allows PDF report downloads.
+
+**2. FastAPI Backend**
+
+- Exposes REST API endpoints.
+- Validates incoming requests.
+- Coordinates observation retrieval and processing.
+- Provides sonification parameters.
+- Connects analysis and reporting services.
+
+**3. Observation Service**
+
+- Retrieves observations through configured data adapters.
+- Processes returned time-series data.
+- Maintains dataset and source metadata.
+- Provides historical observations for visualization and analysis.
+
+**4. Sonification Service**
+
+- Normalizes environmental measurements.
+- Maps observations to musical and acoustic parameters.
+- Generates deterministic sound profiles.
+- Provides structured sonification output to the frontend.
+
+**5. Prediction Service**
+
+- Provides prediction functionality for supported modules.
+- Uses the configured model implementation.
+- Returns predictions and associated uncertainty information where available.
+
+**6. Intelligence Service**
+
+- Produces AI-assisted explanations based on supplied observations and analytical results.
+- Uses Gemini as an interpretation layer when configured.
+- Does not use Gemini as an independent environmental data source.
+
+**7. PDF Report Service**
+
+- Generates downloadable environmental reports.
+- Includes observations, statistics, charts, data provenance, and limitations.
+- Supports compact and detailed report formats.
 
 ---
 
-## Environmental Modules
+## 🎵 Environmental Sonification
 
-Earth Jukebox contains eight environmental modules.
+Sonification is the process of representing data through sound.
 
-| Module | Data / analytical focus | Scientific distinction |
+Earth Jukebox converts environmental observations into sound parameters so that users can explore changes in environmental conditions through audio.
+
+The backend generates structured and deterministic sonification parameters. The frontend uses the Web Audio API to synthesize the corresponding audio.
+
+### Sound Mapping
+
+| Environmental Category | Sound Profile | Frequency Range |
 |---|---|---|
-| 🌊 Ocean | Sea-surface temperature and marine observations | Do not infer unsupported ocean variables or forecasts |
-| 🔥 Fires | Active fire detections and occurrence patterns | Fire detections are observations, not predictions of future ignition or spread |
-| 🌧️ Rain | Precipitation observations and historical trends | Historical rainfall is not a weather forecast |
-| ❄️ Ice | Sea-ice and cryosphere observations | Respect geographical coverage and source resolution |
-| 🌪️ Storms | Satellite-based storm-related observations | Observations do not establish cyclone track or intensity forecasts |
-| 🌿 Vegetation | NDVI/EVI and vegetation changes | Interpret vegetation indices according to their scientific definitions |
-| 💨 Wind | Wind-speed observations and historical analysis | Gridded averages do not necessarily represent local gusts |
-| 🌡️ Temperature | Temperature observations, trends, and supported analysis | Specify the measured variable, units, and temporal resolution |
+| Temperature | Warm analogue sine | 110–880 Hz |
+| Rain | Granular percussion | 150–600 Hz |
+| Wind | Resonant noise | 80–400 Hz |
+| Fires | Staccato pulse | 60–350 Hz |
+| Vegetation | Harmonic chords | 130–520 Hz |
+| Ocean | Deep sub-bass | 55–220 Hz |
+| Ice | Crystalline chimes | 440–1760 Hz |
+| Storms | Atmospheric rumble | 65–500 Hz |
 
-### Module implementation status
+### Sonification Parameters
 
-The following statuses reflect the backend status reported during development:
+The backend can generate parameters such as:
 
-| Module | Reported status |
-|---|---|
-| Temperature | `fully_working` |
-| Rain | `fully_working` |
-| Wind | `fully_working` |
-| Fires | `observation_only` |
-| Vegetation | `historical_analysis` |
-| Ocean | `historical_analysis` |
-| Ice | `historical_analysis` |
-| Storms | `observation_only` |
+- Timestamp
+- Original environmental value
+- Normalized value
+- Pitch frequency
+- MIDI note
+- Musical note
+- Volume in decibels
+- Tempo
+- Rhythm density
+- Intensity
+- Duration
+- Instrument profile
 
-**Important:** A working data-retrieval module is not necessarily a forecasting model. Module status and predictive capability must be documented separately.
+### Sonification Workflow
 
-For every module, document:
+1. The user selects an environmental category and location.
+2. The backend retrieves the relevant observations.
+3. The sonification service processes the time-series values.
+4. Environmental values are mapped to sound parameters.
+5. The backend returns a structured sonification sequence.
+6. The frontend synthesizes the sound using the Web Audio API.
+7. The user can play, pause, stop, and adjust playback volume.
 
-- NASA dataset and official product documentation.
-- Dataset or collection identifier.
-- Provider or NASA DAAC.
-- Variables and units.
-- Spatial and temporal resolution.
-- Date coverage.
-- Authentication requirements.
-- Data quality checks and preprocessing.
-- Analytical method or model version.
-- Evaluation metrics, where applicable.
-- Known limitations.
+**Important:** The audio is synthesized from environmental measurements and backend-generated parameters. It is not a recording of the actual environment.
 
 ---
 
-## Technology Stack
+## 📊 Data Visualization and Analysis
 
-The backend technology stack includes:
+Earth Jukebox provides visual representations of environmental observations.
 
-| Technology | Purpose |
-|---|---|
-| Python 3.11 | Core backend development |
-| FastAPI | REST API development |
-| Pydantic | Request and response validation |
-| NumPy | Numerical computation |
-| Pandas | Data processing and manipulation |
-| Scikit-learn | Machine-learning workflows |
-| Matplotlib | Data visualization |
-| Seaborn | Statistical visualization |
-| Pytest | Automated testing |
-| Uvicorn | ASGI server |
+The dashboard supports:
 
-The authoritative dependency list is the repository's `requirements.txt` or `pyproject.toml`. The table describes the project stack, not a requirement to install unused packages.
+- Historical time-series charts.
+- Environmental value comparisons.
+- Average values.
+- Minimum and maximum values.
+- Observation counts.
+- Dataset and source information.
+
+The visualizations are generated from the observations returned by the backend.
+
+The availability of specific analytical features depends on the environmental module and the returned dataset.
 
 ---
 
-## NASA Data Sources and APIs
+## 🤖 Machine Learning and AI Intelligence
 
-Earth Jukebox follows a NASA-only environmental data policy.
+Machine learning and statistical techniques support environmental analysis and prediction where implemented.
 
-The following are official NASA services, product references, and documentation resources relevant to the project.
+The prediction service is designed to work with supported environmental categories and their available historical observations.
 
-**An important distinction:** A NASA dataset portal, product documentation page, and operational API are not the same thing. A dataset should only be described as integrated after its actual backend access method has been verified.
+### AI-Assisted Explanation
 
-### 1. NASA Earthdata and discovery services
+Earth Jukebox can use Google's Gemini API to generate explanations based on supplied environmental observations and statistical results.
 
-| NASA service | Official resource | Purpose |
-|---|---|---|
-| NASA Earthdata | [Earthdata](https://www.earthdata.nasa.gov/) | Entry point for NASA Earth science data |
-| Common Metadata Repository | [CMR Search API](https://cmr.earthdata.nasa.gov/search/site/docs/search/api.html) | Search NASA collections and granules |
-| Earthdata Search | [Earthdata Search](https://search.earthdata.nasa.gov/) | Discover datasets by location, time, and topic |
-| Earthdata Login | [Data Access Documentation](https://urs.earthdata.nasa.gov/documentation/for_users/data_access) | Authentication for protected NASA resources |
+The AI layer is intended to:
 
-### 2. NASA POWER — Temperature, Rain, and Wind
+- Explain observed environmental patterns.
+- Summarize analytical results.
+- Provide understandable descriptions of environmental changes.
+- Help users interpret generated reports.
 
-<details>
-<summary>NASA POWER API resources</summary>
+**AI data policy:** Gemini is an explanation layer. Environmental observations must come from the configured data sources, not from AI-generated measurements.
 
-| Resource | Official link |
-|---|---|
-| POWER API documentation | [Temporal API Documentation](https://power.larc.nasa.gov/docs/services/api/) |
-| Monthly API | [Monthly API](https://power.larc.nasa.gov/docs/services/api/temporal/monthly/) |
-| Daily API | [Daily API](https://power.larc.nasa.gov/docs/services/api/temporal/daily/) |
-| Parameter dictionary | [NASA POWER Parameters](https://power.larc.nasa.gov/parameters/) |
-| API tutorial | [POWER API Tutorial](https://power.larc.nasa.gov/docs/tutorials/service-data-request/api/) |
-
-Potentially relevant parameter identifiers include:
-
-| Parameter | Meaning |
-|---|---|
-| `T2M` | Temperature at 2 metres |
-| `T2M_MAX` | Maximum temperature at 2 metres |
-| `T2M_MIN` | Minimum temperature at 2 metres |
-| `PRECTOTCORR` | Corrected precipitation |
-| `WS10M` | Wind speed at 10 metres |
-
-Always confirm the parameter definition, community, units, and temporal availability in the official parameter dictionary before using it.
-
-</details>
-
-### 3. NASA FIRMS — Active Fire Detection
-
-<details>
-<summary>NASA FIRMS API resources</summary>
-
-| Resource | Official link |
-|---|---|
-| FIRMS API directory | [FIRMS API](https://firms.modaps.eosdis.nasa.gov/api/) |
-| FIRMS Area API | [Area API](https://firms.modaps.eosdis.nasa.gov/api/area) |
-| FIRMS API tutorial | [API Usage Tutorial](https://firms.modaps.eosdis.nasa.gov/content/academy/data_api/firms_api_use.html) |
-
-FIRMS provides satellite-based active fire detections from supported MODIS and VIIRS sources.
-
-A valid MAP_KEY is required for applicable API requests.
-
-**Security:** Store the MAP_KEY in an environment variable. Never publish it in source code, documentation, logs, or example URLs.
-
-Fire detections indicate observed thermal anomalies. They must not be represented as predictions of future fire events or fire spread.
-
-</details>
-
-### 4. NASA GPM / IMERG — Precipitation
-
-<details>
-<summary>NASA GPM resources</summary>
-
-| Resource | Official link |
-|---|---|
-| GPM data portal | [NASA GPM Data](https://gpm.nasa.gov/data) |
-| IMERG overview | [NASA IMERG](https://gpm.nasa.gov/data/imerg) |
-| GPM product directory | [GPM Data Directory](https://gpm.nasa.gov/data/directory) |
-
-GPM IMERG provides precipitation estimates derived from satellite observations and associated processing.
-
-The exact product version, run, temporal resolution, units, and data-access mechanism must be recorded for the product used by the backend.
-
-</details>
-
-### 5. NASA MODIS — Vegetation
-
-<details>
-<summary>NASA MODIS resources</summary>
-
-| Resource | Official link |
-|---|---|
-| MODIS product catalog | [NASA MODIS Data Products](https://modis.gsfc.nasa.gov/data/dataprod/) |
-| Vegetation index products | [MODIS MOD13](https://modis.gsfc.nasa.gov/data/dataprod/mod13.php) |
-
-Relevant vegetation products include NDVI and EVI.
-
-The exact collection, product version, quality flags, units, spatial resolution, and temporal resolution must be verified before describing a product as integrated.
-
-</details>
-
-### 6. NASA PO.DAAC — Ocean
-
-<details>
-<summary>NASA ocean-data resources</summary>
-
-| Resource | Official link |
-|---|---|
-| NASA PO.DAAC | [Physical Oceanography DAAC](https://podaac.jpl.nasa.gov/) |
-| Earthdata Search | [NASA Earthdata Search](https://search.earthdata.nasa.gov/) |
-
-PO.DAAC provides access to NASA physical-oceanography datasets and related data products.
-
-The exact collection, product identifier, variable, and access endpoint must be documented for the ocean module.
-
-</details>
-
-### 7. NASA Cryosphere Data — Ice
-
-NASA Earthdata can be used to discover relevant cryosphere collections.
-
-| Resource | Official link |
-|---|---|
-| NASA Earthdata Search | [Earthdata Search](https://search.earthdata.nasa.gov/) |
-| NASA CMR API | [CMR Documentation](https://cmr.earthdata.nasa.gov/search/site/docs/search/api.html) |
-
-The exact NASA collection and data archive used by the ice module must be identified.
-
-Do not assume that a product is a NASA-operated dataset simply because it is discoverable through a NASA-related interface. Verify the provider, collection, and archive lineage.
-
-</details>
-
-### Dataset-to-module mapping
-
-| Earth Jukebox module | NASA source family |
-|---|---|
-| Ocean | NASA Earthdata / PO.DAAC |
-| Fires | NASA FIRMS / MODIS / VIIRS |
-| Rain | NASA GPM / IMERG |
-| Ice | Verified NASA cryosphere collections |
-| Storms | Verified NASA satellite and atmospheric observations |
-| Vegetation | NASA MODIS vegetation-index products |
-| Wind | NASA POWER |
-| Temperature | NASA POWER |
-
-### Dataset inventory
-
-For reproducibility, maintain a dataset inventory for every source actually used by the backend.
-
-Each inventory entry should include:
-
-- Module name.
-- NASA service, DAAC, or provider.
-- Dataset title and short name.
-- Collection identifier and version.
-- Exact API endpoint or data-access URL, without credentials.
-- Variables requested and their units.
-- Spatial and temporal resolution.
-- Date coverage.
-- Authentication requirements.
-- Last successful retrieval time.
-- Integration status.
-- Data provenance and limitations.
+AI-generated explanations may be unavailable when the external service is temporarily unavailable or the API is not configured. The application should continue to provide available non-AI functionality.
 
 ---
 
-## 🔬 Data Policy and Scientific Integrity
+## 📄 PDF Environmental Reports
 
-Scientific reliability is a core requirement of Earth Jukebox.
+Earth Jukebox includes a PDF reporting system that allows users to download environmental analysis reports.
 
-### NASA-only environmental data
+Two report formats are supported:
 
-Environmental source data must come from NASA services and eligible NASA data archives.
+**Compact Report**
 
-Do not silently substitute third-party weather, climate, satellite, or geospatial data providers.
+- Environmental category
+- Location and date range
+- Observation summary
+- Key statistics
+- Charts
+- Data-source information
+- Important limitations
 
-Do not present synthetic, random, generated, or cached demonstration values as live NASA observations.
+**Detailed Report**
 
-### Result classification
+- Expanded environmental analysis
+- Historical observations
+- Statistical information
+- Generated charts
+- Sonification details
+- Data provenance
+- AI-assisted summary when available
+- Scientific limitations
 
-Every analytical result should be assigned an appropriate result type:
+Reports are generated through the backend using ReportLab and Matplotlib.
 
-| Result type | Meaning |
-|---|---|
-| `observation` | Data measured or detected by an observing system |
-| `historical_analysis` | Analysis of past environmental conditions |
-| `risk_estimate` | Estimated risk based on a defined methodology |
-| `forecast` | A prediction of future conditions supported by a validated forecasting method |
-| `projection` | A conditional estimate under specified assumptions or scenarios |
-| `unavailable` | Data or analysis is unavailable |
+### Report Generation Workflow
 
-A model output must never be labelled a forecast merely because it predicts a future numerical value.
-
-### Data provenance
-
-Where available, each response should include:
-
-- NASA source and product/collection identifier.
-- Observation and acquisition timestamps.
-- Processing timestamp.
-- Requested coordinates and spatial coverage.
-- Variable name and units.
-- Missing-data and quality notes.
-- Model name and version.
-- Evaluation metadata, where applicable.
+1. User selects an environmental category.
+2. User provides location coordinates and date range.
+3. Frontend sends a request to the PDF report endpoint.
+4. Backend retrieves the required observations.
+5. Report service prepares statistics, charts, and explanations.
+6. PDF generator creates the report.
+7. The frontend downloads the generated PDF.
 
 ---
 
-## Repository Structure
+## 🖥️ Frontend Features
 
-The following is the intended logical structure. Update it to match the actual repository rather than creating unnecessary directories.
+The interactive dashboard provides:
+
+- Environmental category selection.
+- Latitude and longitude input.
+- Optional location label.
+- Browser geolocation support.
+- Date-range selection.
+- Historical observation visualization.
+- Environmental statistics.
+- Sonification playback.
+- Audio volume controls.
+- Compact PDF report download.
+- Detailed PDF report download.
+- Backend health-status checking.
+
+The frontend uses HTML, CSS, JavaScript, Canvas API, and Web Audio API.
+
+---
+
+## ⚙️ Technology Stack
+
+| Component | Technology |
+|---|---|
+| Programming Language | Python |
+| Backend Framework | FastAPI |
+| API Server | Uvicorn |
+| Data Processing | NumPy, Pandas |
+| Machine Learning | Scikit-learn |
+| HTTP Requests | HTTPX |
+| Data Visualization | Matplotlib |
+| PDF Generation | ReportLab |
+| Frontend | HTML, CSS, JavaScript |
+| Chart Rendering | Canvas API |
+| Audio Generation | Web Audio API |
+| AI Explanation | Google Gemini API |
+| Testing | Pytest |
+| Version Control | Git and GitHub |
+
+---
+
+## 📁 Project Structure
 
 ```text
-earth-jukebox/
+Earth-JukeBox/
 │
 ├── app/
 │   ├── main.py
-│   ├── api/
-│   ├── core/
-│   ├── schemas/
+│   │
+│   ├── adapters/
+│   │   └── Environmental data-source adapters
+│   │
+│   ├── routes/
+│   │   └── API route modules
+│   │
 │   ├── services/
-│   ├── data/
-│   ├── modules/
-│   │   ├── ocean/
-│   │   ├── fires/
-│   │   ├── rain/
-│   │   ├── ice/
-│   │   ├── storms/
-│   │   ├── vegetation/
-│   │   ├── wind/
-│   │   └── temperature/
-│   ├── intelligence/
-│   └── sonification/
+│   │   └── Observation, prediction, intelligence,
+│   │       and sonification services
+│   │
+│   ├── reports/
+│   │   ├── summary_generator.py
+│   │   ├── report_service.py
+│   │   ├── chart_generator.py
+│   │   ├── pdf_generator.py
+│   │   └── router.py
+│   │
+│   └── config.py
 │
 ├── tests/
-├── models/
-├── notebooks/
-├── scripts/
-├── docs/
 │
 ├── demo.html
+├── requirements.txt
 ├── .env.example
 ├── .gitignore
-├── requirements.txt
 └── README.md
 ```
 
+*The structure above is a high-level representation. Actual filenames and directories may vary with the current repository implementation.*
+
 ---
 
-## Getting Started
+## 🚀 Installation and Setup
 
 ### Prerequisites
 
-- Python 3.11 recommended.
-- Git.
-- Windows 10/11, macOS, or Linux.
-- VS Code or another Python-compatible editor.
-- Terminal: PowerShell, Command Prompt, or Bash.
+- Python 3.11
+- Git
+- Visual Studio Code (recommended)
+- Internet connection for external data services
 
-### 1. Clone the repository
+### 1. Clone the Repository
 
 ```bash
-git clone <YOUR_GITHUB_REPOSITORY_URL>
-cd earth-jukebox
+git clone https://github.com/kasidmd34-sudo/Earth-JukeBox.git
 ```
 
-Replace the placeholder with the actual repository URL.
+### 2. Navigate to the Project
 
-### 2. Create a virtual environment
+```bash
+cd Earth-JukeBox
+```
 
-**Windows PowerShell**
+### 3. Create a Virtual Environment
+
+```bash
+python -m venv .venv
+```
+
+### 4. Activate the Virtual Environment
+
+**Windows PowerShell:**
 
 ```powershell
-py -3.11 -m venv .venv
-.venv\Scripts\Activate.ps1
+.\.venv\Scripts\Activate.ps1
 ```
 
-If PowerShell blocks script activation, use Command Prompt:
+**Windows Command Prompt:**
 
 ```cmd
 .venv\Scripts\activate.bat
 ```
 
-**macOS / Linux**
+### 5. Install Dependencies
 
 ```bash
-python3.11 -m venv .venv
-source .venv/bin/activate
-```
-
-### 3. Install dependencies
-
-If the project contains `requirements.txt`:
-
-```bash
-python -m pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
-If the project uses `pyproject.toml` or another dependency manager, follow its instructions instead.
+### 6. Configure Environment Variables
 
-### 4. Configure environment variables
-
-Copy the example environment file:
-
-**PowerShell**
-
-```powershell
-Copy-Item .env.example .env
-```
-
-**macOS / Linux**
-
-```bash
-cp .env.example .env
-```
-
-Add the credentials required by the NASA services actually used by the project.
-
-### 5. Start the backend
-
-From the repository root:
-
-```bash
-uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
-```
-
-This command assumes the application entry point is `app.main:app`.
-
----
-
-## ⚙️ Configuration
-
-The `.env` file contains environment-specific settings.
-
-Example:
+Create a `.env` file in the project root if required.
 
 ```env
-ENVIRONMENT=development
-
-API_HOST=0.0.0.0
-API_PORT=8000
-
-ALLOWED_ORIGINS=http://localhost:3000,http://127.0.0.1:3000,http://localhost:5173,http://localhost:8000,http://127.0.0.1:8000
-
-# NASA credentials
-NASA_EARTHDATA_TOKEN=
-NASA_FIRMS_MAP_KEY=
-
-# Storage
-CACHE_DIR=./data/cache
-MODEL_ARTIFACTS_DIR=./artifacts/models
-EVALUATION_DIR=./artifacts/evaluations
-
-# HTTP configuration
-HTTP_TIMEOUT_SECONDS=30
-HTTP_MAX_RETRIES=3
+GEMINI_API_KEY=your_gemini_api_key
 ```
 
-Only retain variables that are actually read by the application.
+Use `.env.example` as the template where available.
 
-**Never commit `.env`, API keys, Earthdata tokens, or other private credentials.**
+Do not commit real API keys or secret credentials to GitHub.
 
----
+### 7. Start the Backend Server
 
-## 🔌 Running the API
+```bash
+uvicorn app.main:app --reload
+```
 
-Once the server starts, the following local URLs are intended to be available:
+### 8. Open the Application
 
 | Resource | URL |
 |---|---|
-| API root | [http://127.0.0.1:8000/](http://127.0.0.1:8000/) |
-| Health check | [http://127.0.0.1:8000/health](http://127.0.0.1:8000/health) |
-| Interactive demo | [http://127.0.0.1:8000/demo](http://127.0.0.1:8000/demo) |
-| Swagger documentation | [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs) |
-| ReDoc documentation | [http://127.0.0.1:8000/redoc](http://127.0.0.1:8000/redoc) |
+| API Root | http://127.0.0.1:8000/ |
+| Interactive API Documentation | http://127.0.0.1:8000/docs |
+| Alternative API Documentation | http://127.0.0.1:8000/redoc |
+| Frontend Demo | http://127.0.0.1:8000/demo |
+| Health Check | http://127.0.0.1:8000/health |
 
 ---
 
-## 📡 API Reference
+## 🔗 API Endpoints
 
-The backend exposes endpoints for environmental data, analysis, prediction, model evaluation, sonification, and provenance.
+The backend exposes REST endpoints for observations, prediction, sonification, intelligence, evaluation, metadata, and reports.
 
-The following route inventory reflects the implementation described by the project. Confirm each route, HTTP method, and request schema against the running FastAPI application before treating this table as a complete API contract.
-
-| Method | Endpoint | Purpose |
+| Method | Endpoint | Description |
 |---|---|---|
-| `GET` | `/` | API root and version |
-| `GET` | `/health` | Health and NASA policy status |
-| `GET` | `/demo` | Serve the demonstration dashboard |
-| `GET` | `/modules` | Report capabilities of all eight modules |
-| `GET / POST` | `/observations` | Retrieve supported NASA observations |
-| `POST` | `/predict` | Run supported statistical prediction workflows |
-| `GET / POST` | `/predict/{condition}` | Condition-specific prediction or historical analysis |
-| `GET` | `/evaluate/{condition}` | Evaluate a model against a seasonal-naive baseline |
-| `GET / POST` | `/sonification` | Generate sonification parameters |
-| `GET / POST` | `/intelligence/analyze` | Combine environmental module outputs |
-| `GET / POST` | `/location/analyze` | Validate coordinates and analyze location context |
-| `GET` | `/models` | List registered models and validation strategies |
-| `GET` | `/models/{condition}` | Retrieve condition-specific model metadata |
-| `GET` | `/datasets` | Retrieve dataset catalog |
-| `GET` | `/metadata/{condition}` | Retrieve dataset metadata |
-| `GET` | `/provenance/{condition}` | Retrieve source and processing provenance |
+| GET | `/` | API root |
+| GET | `/health` | Backend health check |
+| GET | `/modules` | Available environmental modules |
+| POST | `/observations` | Submit an observation request |
+| GET | `/observations` | Retrieve environmental observations |
+| POST | `/predict` | Submit a prediction request |
+| POST | `/predict/{condition}` | Submit a category-specific prediction |
+| GET | `/predict/{condition}` | Retrieve category-specific predictions |
+| POST | `/intelligence/analyze` | Submit an intelligence analysis request |
+| GET | `/intelligence/analyze` | Retrieve an intelligence analysis |
+| POST | `/sonification` | Submit a sonification request |
+| GET | `/sonification` | Retrieve sonification parameters |
+| GET | `/evaluate/{condition}` | Evaluate supported environmental analysis |
+| POST | `/location/analyze` | Submit a location analysis request |
+| GET | `/location/analyze` | Retrieve location analysis |
+| GET | `/datasets` | Retrieve dataset information |
+| GET | `/metadata/{condition}` | Retrieve category metadata |
+| GET | `/provenance/{condition}` | Retrieve data provenance |
+| GET | `/models` | Retrieve available model information |
+| GET | `/models/{condition}` | Retrieve category-specific model information |
+| GET | `/reports/{condition}/pdf` | Generate and download a PDF report |
 
-### Example health-check response
+For the complete request parameters, response schemas, and examples, run the backend and visit:
 
-```json
-{
-  "status": "healthy",
-  "timestamp": "2026-11-07T19:02:18.498633Z",
-  "nasa_policy_compliance": "STRICT_NASA_ONLY"
-}
-```
-
-### Example API exploration
-
-Open:
-
-```text
-http://127.0.0.1:8000/docs
-```
-
-Swagger UI allows you to inspect available endpoints, review request schemas, and test API calls interactively.
+`http://127.0.0.1:8000/docs`
 
 ---
 
-## Example Workflow
+## 🧪 Testing
 
-A typical Earth Jukebox request follows this sequence:
+The project uses Pytest for testing.
 
-1. The frontend submits a location, date range, and environmental category.
-2. The API validates coordinates and date chronology.
-3. The relevant module retrieves data from its configured NASA source.
-4. The preprocessing layer handles missing values, duplicates, and invalid records.
-5. The module performs supported observation retrieval, historical analysis, or prediction.
-6. The API returns structured information, including units, provenance, result type, and limitations.
-7. The Sonification Parameter Engine maps selected environmental variables into acoustic parameters.
-8. The frontend visualizes the results, while the audio component uses the returned parameters.
-
----
-
-## Machine Learning and Evaluation
-
-Machine learning is used only where the available dataset and validation methodology support the intended task.
-
-The reported model-development approach includes:
-
-| Component | Method |
-|---|---|
-| Baseline | Seasonal-naive persistence, using lag 12 |
-| Validation | Chronological 80/20 holdout |
-| Features | Autoregressive lags `[1, 2, 12]` |
-| Temporal features | Cyclical sine/cosine calendar features |
-| Uncertainty | Empirical residual bootstrapping |
-| Interval | 95% uncertainty interval |
-
-### Scientific restrictions
-
-- Active fire detections must not be used to claim future fire ignition or spread forecasts.
-- Storm observations must not be represented as cyclone track or intensity forecasts.
-- Historical trends must not automatically be described as future projections.
-- Every predictive model should be compared against an appropriate baseline.
-- Future information must never leak into training or validation features.
-
-### Evaluation metrics
-
-Depending on the task, model evaluation can include:
-
-- MAE — Mean Absolute Error.
-- MSE — Mean Squared Error.
-- RMSE — Root Mean Squared Error.
-- R² — Coefficient of Determination.
-
-Report actual evaluation results rather than assuming that a model performs well because it has been implemented.
-
----
-
-## Sonification Engine
-
-Earth Jukebox translates environmental measurements and analysis outputs into structured acoustic parameters.
-
-The backend is responsible for **parameter generation**, not necessarily the final audio synthesis.
-
-The downstream audio-generation component can use the following parameters:
-
-| Parameter | Description | Intended range |
-|---|---|---|
-| `pitch_hz` | Frequency in Hertz | 20–20,000 Hz |
-| `midi_note` | MIDI pitch value | 0–127 |
-| `volume_db` | Audio level | -36 to -6 dB |
-| `tempo_bpm` | Rhythmic cadence | 30–240 BPM |
-| `rhythm_density` | Rhythm subdivision density | 0–1 |
-| `intensity` | Harmonic brightness/filter factor | 0–1 |
-| `duration_ms` | Envelope gate duration | Defined in milliseconds |
-
-### Sonification pipeline
-
-```text
-NASA Environmental Measurements
-              |
-              v
-      Environmental Analysis
-              |
-              v
-     Parameter Normalization
-              |
-              v
-      Acoustic Mapping
-              |
-              v
-     Sonification Parameters
-              |
-              v
-       Audio Generation
-```
-
-The mapping should be deterministic and documented so that the same valid input produces consistent parameters.
-
-The acoustic mapping is a creative representation of environmental measurements; it is not itself a scientific measurement.
-
----
-
-## Interactive Demo
-
-The project includes a standalone `demo.html` dashboard built using:
-
-- HTML5
-- CSS3
-- Vanilla JavaScript
-- Chart.js
-- Web Audio API
-
-### Running the demo
-
-If the FastAPI application serves the demo:
-
-```text
-http://127.0.0.1:8000/demo
-```
-
-Alternatively, open `demo.html` directly in a browser.
-
-For local development, serving the page through a local HTTP server is preferable to opening it through the `file://` protocol, particularly when browser requests to the backend are involved.
-
-### Reported demo features
-
-- Preset locations.
-- Multi-module environmental analysis.
-- Time-series visualization.
-- 95% uncertainty-band visualization.
-- Eight-theme sonification telemetry.
-- Web Audio API audition synthesizer.
-- Unified environmental intelligence reporting.
-- Configurable API base URL.
-
-The dashboard should display unavailable or demonstration-only data clearly and must not label it as live NASA data.
-
----
-
-## Testing and Code Quality
-
-Run the test suite from the repository root:
+Run the test suite from the project root:
 
 ```bash
-pytest -v
+python -m pytest -v
 ```
 
-The reported automated test suite contains 26 deterministic offline tests covering:
+To run individual report-related tests where available:
 
-- Schema validation and date chronology.
-- NASA adapter parsing.
-- Missing-value handling, including `-999.0`.
-- Scientific restrictions for fires, storms, and non-polar ice.
-- Parallel intelligence-layer synthesis.
-- Sonification parameter ranges.
-- Physical-value clipping across the eight modules.
-- Model serialization and loading.
-- Uncertainty interval calculation.
+```bash
+python test_chart_generator.py
+python test_gemini_summary.py
+python test_pdf_generator.py
+python test_report_service.py
+```
 
-Offline tests validate application behavior without necessarily proving that external NASA services are currently reachable.
+To check Python syntax for report modules:
 
-For external integration testing, test the actual data-access endpoints separately and record retrieval timestamps and response metadata.
-
----
-
-## Scientific Limitations
-
-Earth Jukebox is an educational and experimental environmental intelligence project.
-
-Important limitations include:
-
-1. Satellite observations do not automatically provide deterministic future forecasts.
-2. FIRMS active fire detections represent observed thermal anomalies, not future fire spread.
-3. Historical precipitation observations do not provide flash-flood early warning by themselves.
-4. Gridded wind averages may not capture local gusts or highly localized conditions.
-5. Storm observations alone do not establish cyclone track or intensity predictions.
-6. Cryosphere monitoring must respect the geographical and temporal coverage of the selected dataset.
-7. Machine-learning predictions are limited by data quality, sample size, validation methodology, and model assumptions.
-8. Sonification is a representation of environmental information, not a substitute for scientific interpretation.
-
-> **Safety notice:** Earth Jukebox is not an emergency response platform and must not be used as an official disaster early-warning system.
+```bash
+python -m py_compile app/reports/pdf_generator.py app/reports/summary_generator.py
+```
 
 ---
 
-## Roadmap
+## ☁️ Deployment
 
-The following checklist represents the development milestones reported for the project. Keep it synchronized with the actual repository and test results.
+Earth Jukebox can be deployed using a hosting service that supports Python applications and long-running FastAPI servers.
 
-- [x] Identify and document relevant NASA data sources.
-- [x] Implement shared ingestion, validation, and provenance utilities.
-- [x] Implement the first environmental modules.
-- [x] Implement the remaining environmental modules.
-- [x] Add model baselines and chronological validation.
-- [x] Implement Environmental Intelligence Layer synthesis.
-- [x] Define the sonification parameter contract.
-- [x] Implement FastAPI schemas and endpoints.
-- [x] Build the interactive `demo.html` dashboard.
-- [x] Complete the reported 26-test automated test suite.
-- [ ] Expand live NASA integration tests.
-- [ ] Improve dataset inventory automation.
-- [ ] Expand model evaluation and documentation.
-- [ ] Improve frontend and audio-engine integration.
-- [ ] Prepare deployment and production configuration.
+### Example: Render
 
----
+**Build Command**
 
-## Contributing
+```bash
+pip install -r requirements.txt
+```
 
-Contributions and improvements are welcome.
+**Start Command**
 
-1. Create a feature branch.
-2. Keep changes focused and explain their purpose.
-3. Add or update automated tests.
-4. Document new datasets, endpoints, models, and configuration.
-5. Run the test suite before submitting a pull request.
-6. Never commit secrets or private credentials.
-7. Avoid unsupported scientific claims.
+```bash
+uvicorn app.main:app --host 0.0.0.0 --port $PORT
+```
+
+Configure required environment variables through the hosting provider's environment-variable settings.
+
+Ensure that the frontend and backend are deployed together or that the frontend is configured to communicate with the deployed backend URL.
 
 ---
 
-## Acknowledgements
+## ⚠️ Scientific Limitations and Responsible Data Interpretation
 
-Earth Jukebox is built around NASA Earth-observation data, scientific research, and open environmental data resources.
+Environmental observations must be interpreted according to their actual spatial and temporal resolution.
 
-We acknowledge the work of NASA and its Earth science missions, instruments, data providers, and Distributed Active Archive Centers.
+Earth Jukebox does not claim that every satellite dataset provides real-time measurements or reliable future forecasts.
 
-Please cite the exact NASA mission, instrument, product, collection, and DAAC used by each module according to its official acknowledgement and citation guidance.
+| Module | Important limitation |
+|---|---|
+| Temperature | NASA POWER monthly gridded data does not resolve local urban microclimates or provide direct ground-station measurements. |
+| Rain | Monthly precipitation aggregates are not suitable for flash-flood early warning. |
+| Wind | Grid-averaged wind speed does not represent local gust dynamics. |
+| Fires | Active fire detections identify observed hotspots, not future fire ignition or spread. |
+| Vegetation | Cloud cover and atmospheric aerosols can introduce gaps and uncertainty. |
+| Ocean | Coastal measurements can be affected by land-mask contamination and spatial resolution. |
+| Ice | Sea-ice observations are limited to polar regions and can be affected by retrieval uncertainty. |
+| Storms | Monthly precipitation observations do not provide cyclone tracks or storm-intensity forecasts. |
 
-### Built for the NASA Space Apps Challenge
+### Responsible Interpretation
 
-**Earth Jukebox — Listen to the changing Earth. 🌍🎵**
+- Historical observations must not be presented as future predictions.
+- Predictions should only be shown where a supported model is implemented.
+- Uncertainty should be communicated when available.
+- Data-source information should be preserved.
+- AI-generated explanations must not replace the original environmental observations.
+- Sonification should be understood as an auditory representation of data, not a direct recording of environmental conditions.
+
+---
+
+## 🔮 Future Scope
+
+Potential future improvements include:
+
+- Expanded integration of verified NASA Earth-observation datasets.
+- Improved environmental data quality checks.
+- More advanced time-series analysis.
+- Additional statistical and machine-learning models where scientifically appropriate.
+- Enhanced uncertainty visualization.
+- More flexible sonification controls.
+- Interactive geographical visualization.
+- Improved report customization.
+- Expanded accessibility features.
+- Better monitoring of data-source availability and provenance.
+
+These are potential development directions and should not be interpreted as already implemented features.
+
+---
+
+## 👨‍💻 Developer
+
+**Project:** Earth Jukebox  
+**GitHub:** [kasidmd34-sudo](https://github.com/kasidmd34-sudo)  
+**Repository:** [Earth-JukeBox](https://github.com/kasidmd34-sudo/Earth-JukeBox)
+
+---
+
+## 📜 Acknowledgements
+
+Earth Jukebox builds on publicly available Earth-observation resources and scientific datasets.
+
+We acknowledge the work of:
+
+- [NASA](https://www.nasa.gov/)
+- [NASA POWER](https://power.larc.nasa.gov/)
+- [NASA FIRMS](https://firms.modaps.eosdis.nasa.gov/)
+- [NASA GPM](https://gpm.nasa.gov/)
+- [NASA Earthdata](https://www.earthdata.nasa.gov/)
+- [NASA LP DAAC](https://lpdaac.usgs.gov/)
+- [NASA PO.DAAC](https://podaac.jpl.nasa.gov/)
+- [NASA GES DISC](https://disc.gsfc.nasa.gov/)
+- [National Snow and Ice Data Center](https://nsidc.org/)
+
+---
+
+### 🌎 Earth Jukebox
+
+**Turning Earth's environmental data into intelligence — and intelligence into sound.**
