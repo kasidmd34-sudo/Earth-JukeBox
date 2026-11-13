@@ -17,7 +17,7 @@ class Settings(BaseSettings):
 
     # Gemini AI - report summaries only
     GEMINI_API_KEY: str = ""
-    GEMINI_MODEL: str = "gemini-3.8-flash"
+    GEMINI_MODEL: str = "gemini-2.5-flash"
     GEMINI_TIMEOUT_SECONDS: float = 30.0
 
     # Storage & Network

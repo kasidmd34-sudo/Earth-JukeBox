@@ -27,7 +27,11 @@ class OceanDataAdapter:
     async def fetch_sst_series(
         cls, latitude: float, longitude: float, start_year: int, end_year: int
     ) -> List[TimeSeriesPoint]:
-        """Fetch sea surface skin temperature (TS) from NASA POWER reanalysis/satellite records."""
+        """Return NASA POWER surface temperature (TS) as a proxy.
+
+        This is NOT the GHRSST MUR analysed_sst product. Use
+        discover_sst_granules to locate actual MUR granules.
+        """
         payload = await NASAPowerAdapter.fetch_monthly_climatology(
             latitude, longitude, start_year, end_year, ["TS"]
         )

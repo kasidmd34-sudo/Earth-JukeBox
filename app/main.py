@@ -20,7 +20,9 @@ from app.api import (
     routes_evaluation,
     routes_location,
     routes_metadata,
+    routes_media
 )
+from app.web import pages as web_pages
 
 logging.basicConfig(
     level=logging.INFO,
@@ -125,3 +127,5 @@ app.include_router(routes_evaluation.router)
 app.include_router(routes_location.router)
 app.include_router(routes_metadata.router)
 app.include_router(reports_router)
+app.include_router(routes_media.router)
+app.include_router(web_pages.router)

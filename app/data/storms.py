@@ -27,7 +27,11 @@ class StormsDataAdapter:
     async def fetch_extreme_storm_series(
         cls, latitude: float, longitude: float, start_year: int, end_year: int
     ) -> List[TimeSeriesPoint]:
-        """Fetch GPM-calibrated precipitation records to identify severe convective storm precipitation."""
+        """Return NASA POWER corrected precipitation as a broad proxy.
+
+        This is NOT a GPM IMERG granule extraction or cyclone-track dataset.
+        Use discover_storm_precipitation to locate GPM granules.
+        """
         payload = await NASAPowerAdapter.fetch_monthly_climatology(
             latitude, longitude, start_year, end_year, ["PRECTOTCORR"]
         )

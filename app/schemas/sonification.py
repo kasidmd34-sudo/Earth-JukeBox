@@ -17,6 +17,13 @@ class SonificationDataPoint(BaseModel):
     intensity: float = Field(..., ge=0.0, le=1.0, description="Harmonic distortion or brightness")
     duration_ms: float = Field(..., gt=0, description="Envelope gate duration")
     profile_instrument: str = Field(..., description="Acoustic or synth palette allocation")
+    event_label: Optional[str] = Field(default=None, description="Alphabetic graph/report event marker")
+    chord_name: Optional[str] = Field(default=None, description="Triad chord associated with this event")
+    chord_notes: List[str] = Field(default_factory=list, description="Chord note names")
+    chord_midi: List[int] = Field(default_factory=list, description="Chord MIDI note numbers")
+    chord_frequencies_hz: List[float] = Field(default_factory=list, description="Chord frequencies in Hz")
+    pitch_direction: Optional[str] = Field(default=None, description="Higher/lower/unchanged relative to previous event")
+    pitch_tier: Optional[str] = Field(default=None, description="Hierarchical intensity register: low, mid, or high")
 
 
 class SonificationSeries(BaseModel):
@@ -28,4 +35,8 @@ class SonificationSeries(BaseModel):
     parameters: List[SonificationDataPoint]
     dynamic_range_min: float
     dynamic_range_max: float
+    chord_hierarchy: Dict[str, Any] = Field(
+        default_factory=dict,
+        description="Hierarchical organization of chords by register tier and harmonic structure",
+    )
     uncertainty_acoustic_cue: str = "Mapped to envelope stereo-spread / lowpass resonance"

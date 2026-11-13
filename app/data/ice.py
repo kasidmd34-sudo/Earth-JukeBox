@@ -27,7 +27,11 @@ class CryosphereDataAdapter:
     async def fetch_polar_cryosphere_series(
         cls, latitude: float, longitude: float, start_year: int, end_year: int
     ) -> List[TimeSeriesPoint]:
-        """Fetch polar surface temperature indicating freeze/melt status from NASA records."""
+        """Return a clearly labelled NASA POWER surface-temperature proxy.
+
+        This is NOT sea-ice extent/area. The dedicated NSIDC granule discovery
+        method above is available for locating actual Sea Ice Index granules.
+        """
         payload = await NASAPowerAdapter.fetch_monthly_climatology(
             latitude, longitude, start_year, end_year, ["TS"]
         )

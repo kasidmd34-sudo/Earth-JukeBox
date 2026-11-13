@@ -1,9 +1,4 @@
-"""Chart generation for Earth Jukebox environmental PDF reports.
-
-Charts are generated in memory as PNG images. No external environmental
-data is retrieved here. All plotted values come from the supplied NASA
-report context.
-"""
+"""Chart generation for Earth Jukebox environmental and media PDF reports."""
 
 from datetime import datetime, timezone
 from io import BytesIO
@@ -16,9 +11,11 @@ import matplotlib.dates as mdates
 import matplotlib.pyplot as plt
 import numpy as np
 
+from app.services.sonification_service import SonificationService
+
 
 class ChartGenerator:
-    """Creates report-ready charts from NASA-derived observations."""
+    """Creates report-ready charts from NASA-derived or media-derived observations."""
 
     CATEGORY_TITLES = {
         "temperature": "Surface Temperature",
@@ -29,10 +26,9 @@ class ChartGenerator:
         "ice": "Cryosphere Returned Measurements",
         "storms": "Storm-Related Precipitation Observations",
         "vegetation": "Vegetation Adapter Returned Measurements",
+        "media": "Uploaded Media Visual Profile",
     }
 
-    # Presentation-only unit labels.
-    # Original NASA adapter metadata remains unchanged.
     UNIT_DISPLAY_LABELS = {
         "degrees_Celsius": "°C",
         "degree_Celsius": "°C",
@@ -52,27 +48,21 @@ class ChartGenerator:
         "percentage": "%",
     }
 
-    # Event-based categories must not be drawn as continuous time series.
     EVENT_BASED_CATEGORIES = {"fires", "storms"}
 
     @staticmethod
     def _normalise_datetime(value: datetime) -> datetime:
-        """Return a timezone-naive datetime whose clock is expressed in UTC."""
         if value.tzinfo is None:
             value = value.replace(tzinfo=timezone.utc)
         else:
             value = value.astimezone(timezone.utc)
-
         return value.replace(tzinfo=None)
 
     @staticmethod
     def _parse_timestamp(value: Any) -> Optional[datetime]:
-        """Parse common NASA date/timestamp formats and normalize to UTC."""
         if value is None or value == "":
             return None
-
         value = str(value).strip()
-
         formats = (
             "%Y-%m-%d",
             "%Y%m%d",
@@ -82,19 +72,13 @@ class ChartGenerator:
             "%Y-%m-%dT%H:%M:%SZ",
             "%Y-%m-%d %H:%M:%S",
         )
-
         for fmt in formats:
             try:
-                parsed = datetime.strptime(value, fmt)
-                return ChartGenerator._normalise_datetime(parsed)
+                return ChartGenerator._normalise_datetime(datetime.strptime(value, fmt))
             except ValueError:
                 continue
-
         try:
-            parsed = datetime.fromisoformat(
-                value.replace("Z", "+00:00")
-            )
-            return ChartGenerator._normalise_datetime(parsed)
+            return ChartGenerator._normalise_datetime(datetime.fromisoformat(value.replace("Z", "+00:00")))
         except ValueError:
             return None
 
@@ -102,441 +86,225 @@ class ChartGenerator:
     def _extract_observations(
         cls,
         report_data: Dict[str, Any],
-    ) -> Tuple[List[datetime], List[float], List[str]]:
-        """Extract valid timestamp/value pairs from report data."""
-
+    ) -> Tuple[List[Any], List[float], List[str], bool]:
+        """Extract observations; supports both date-based and sequential media indices."""
         observations = report_data.get("observations", []) or []
-        valid_records: List[Tuple[datetime, float]] = []
+        is_media = report_data.get("observation_type") == "media_sequence"
 
+        if is_media:
+            x_vals: List[int] = []
+            y_vals: List[float] = []
+            labels: List[str] = []
+            for idx, item in enumerate(observations):
+                if not isinstance(item, dict):
+                    continue
+                val = item.get("value")
+                if val is None or isinstance(val, bool):
+                    continue
+                try:
+                    num = float(val)
+                except (TypeError, ValueError, OverflowError):
+                    continue
+                if np.isfinite(num):
+                    x_vals.append(idx + 1)
+                    y_vals.append(num)
+                    labels.append(str(item.get("timestamp", f"Step {idx + 1}")))
+            return x_vals, y_vals, labels, True
+
+        valid_records: List[Tuple[datetime, float]] = []
         for item in observations:
             if not isinstance(item, dict):
                 continue
-
-            timestamp = cls._parse_timestamp(
-                item.get("timestamp")
-            )
-
-            value = item.get("value")
-
-            if (
-                timestamp is None
-                or value is None
-                or isinstance(value, bool)
-            ):
+            ts = cls._parse_timestamp(item.get("timestamp"))
+            val = item.get("value")
+            if ts is None or val is None or isinstance(val, bool):
                 continue
-
             try:
-                numeric_value = float(value)
+                num = float(val)
             except (TypeError, ValueError, OverflowError):
                 continue
+            if np.isfinite(num):
+                valid_records.append((ts, num))
 
-            if not np.isfinite(numeric_value):
-                continue
-
-            valid_records.append(
-                (timestamp, numeric_value)
-            )
-
-        # Retain duplicate timestamps:
-        # multiple event observations may be valid.
-        valid_records.sort(
-            key=lambda record: record[0]
-        )
-
-        dates = [
-            record[0] for record in valid_records
-        ]
-
-        values = [
-            record[1] for record in valid_records
-        ]
-
-        labels = [
-            date.strftime("%Y-%m-%d")
-            for date in dates
-        ]
-
-        return dates, values, labels
+        valid_records.sort(key=lambda r: r[0])
+        dates = [r[0] for r in valid_records]
+        values = [r[1] for r in valid_records]
+        labels = [d.strftime("%Y-%m-%d") for d in dates]
+        return dates, values, labels, False
 
     @staticmethod
     def _figure_to_buffer(fig: plt.Figure) -> BytesIO:
-        """Save a Matplotlib figure as an in-memory PNG."""
-
         buffer = BytesIO()
-
-        fig.savefig(
-            buffer,
-            format="png",
-            dpi=180,
-            bbox_inches="tight",
-            facecolor="white",
-        )
-
+        fig.savefig(buffer, format="png", dpi=180, bbox_inches="tight", facecolor="white")
         buffer.seek(0)
         plt.close(fig)
-
         return buffer
 
     @classmethod
-    def _create_empty_chart(
-        cls,
-        title: str,
-        message: str = "No valid observations available for this chart.",
-    ) -> BytesIO:
-        """Create a placeholder chart when observations are unavailable."""
-
-        fig, ax = plt.subplots(
-            figsize=(9, 4.5)
-        )
-
-        ax.set_title(
-            title,
-            fontsize=14,
-            fontweight="bold",
-        )
-
-        ax.text(
-            0.5,
-            0.5,
-            message,
-            horizontalalignment="center",
-            verticalalignment="center",
-            transform=ax.transAxes,
-            fontsize=11,
-        )
-
+    def _create_empty_chart(cls, title: str, message: str = "No valid observations available for this chart.") -> BytesIO:
+        fig, ax = plt.subplots(figsize=(9, 4.5))
+        ax.set_title(title, fontsize=14, fontweight="bold")
+        ax.text(0.5, 0.5, message, ha="center", va="center", transform=ax.transAxes, fontsize=11)
         ax.set_xticks([])
         ax.set_yticks([])
-
         for spine in ax.spines.values():
             spine.set_visible(False)
-
         return cls._figure_to_buffer(fig)
 
     @classmethod
     def _format_unit(cls, unit: Any) -> str:
-        """Return a readable display unit without changing source metadata."""
-
         raw_unit = str(unit or "").strip()
-
-        return cls.UNIT_DISPLAY_LABELS.get(
-            raw_unit,
-            raw_unit,
-        )
+        return cls.UNIT_DISPLAY_LABELS.get(raw_unit, raw_unit)
 
     @classmethod
-    def _get_measurement_label(
-        cls,
-        condition: str,
-        report_data: Dict[str, Any],
-    ) -> str:
-        """Build a cautious label using the unit returned by the adapter."""
-
-        unit = cls._format_unit(
-            report_data.get("unit")
-        )
-
-        unit_label = (
-            unit if unit else "unit not supplied"
-        )
-
+    def _get_measurement_label(cls, condition: str, report_data: Dict[str, Any]) -> str:
+        unit = cls._format_unit(report_data.get("unit"))
+        unit_label = unit if unit else "unit not supplied"
         if condition == "fires":
             return f"Fire Radiative Power ({unit_label})"
-
         if condition == "storms":
-            return (
-                "Returned precipitation measurement "
-                f"({unit_label})"
-            )
-
+            return f"Returned precipitation measurement ({unit_label})"
         if condition == "ice":
-            return (
-                "Returned cryosphere measurement "
-                f"({unit_label})"
-            )
-
+            return f"Returned cryosphere measurement ({unit_label})"
         if condition == "vegetation":
-            return (
-                "Returned adapter measurement "
-                f"({unit_label})"
-            )
-
-        title = cls.CATEGORY_TITLES.get(
-            condition,
-            condition.capitalize(),
-        )
-
+            return f"Returned adapter measurement ({unit_label})"
+        title = cls.CATEGORY_TITLES.get(condition, condition.capitalize())
         return f"{title} ({unit_label})"
 
     @classmethod
-    def _is_event_based(
-        cls,
-        condition: str,
-        report_data: Dict[str, Any],
-    ) -> bool:
-        """Use event plots for event categories or explicitly irregular data."""
-
+    def _is_event_based(cls, condition: str, report_data: Dict[str, Any]) -> bool:
         if condition in cls.EVENT_BASED_CATEGORIES:
             return True
-
-        source = report_data.get(
-            "data_source", {}
-        ) or {}
-
+        source = report_data.get("data_source", {}) or {}
         if not isinstance(source, dict):
             return False
-
-        temporal_resolution = str(
-            source.get("temporal_resolution", "") or ""
-        ).lower()
-
-        irregular_terms = (
-            "event-based",
-            "event based",
-            "irregular",
-            "as available",
-        )
-
-        return any(
-            term in temporal_resolution
-            for term in irregular_terms
-        )
+        temporal_res = str(source.get("temporal_resolution", "") or "").lower()
+        return any(term in temporal_res for term in ("event-based", "event based", "irregular", "as available"))
 
     @classmethod
-    def _get_time_axis_label(
-        cls,
-        condition: str,
-        report_data: Dict[str, Any],
-    ) -> str:
-        """Choose an appropriate label for the observation time axis."""
-
+    def _get_time_axis_label(cls, condition: str, report_data: Dict[str, Any], is_media: bool) -> str:
+        if is_media:
+            return "Media Frame / Spatial Scan Step"
         if cls._is_event_based(condition, report_data):
             return "Observation Date (UTC)"
-
-        source = report_data.get(
-            "data_source", {}
-        ) or {}
-
-        temporal_resolution = ""
-
-        if isinstance(source, dict):
-            temporal_resolution = str(
-                source.get("temporal_resolution", "") or ""
-            ).strip().lower()
-
-        if "monthly" in temporal_resolution:
+        source = report_data.get("data_source", {}) or {}
+        temporal_res = str(source.get("temporal_resolution", "") or "").strip().lower() if isinstance(source, dict) else ""
+        if "monthly" in temporal_res:
             return "Observation Month"
-
         return "Observation Date (UTC)"
 
     @classmethod
-    def create_observation_chart(
-        cls,
-        report_data: Dict[str, Any],
-    ) -> BytesIO:
-        """Create a time-based chart with category-appropriate visualization."""
-
-        condition = report_data.get(
-            "condition", "unknown"
-        )
-
-        dates, values, _ = cls._extract_observations(
-            report_data
-        )
-
-        title = cls.CATEGORY_TITLES.get(
-            condition,
-            condition.capitalize(),
-        )
+    def create_observation_chart(cls, report_data: Dict[str, Any]) -> BytesIO:
+        condition = report_data.get("condition", "unknown")
+        x_vals, values, labels, is_media = cls._extract_observations(report_data)
+        title = cls.CATEGORY_TITLES.get(condition, condition.capitalize())
 
         if not values:
-            return cls._create_empty_chart(
-                f"{title} Observations"
-            )
+            return cls._create_empty_chart(f"{title} Observations")
 
-        measurement_label = cls._get_measurement_label(
-            condition,
-            report_data,
-        )
+        measurement_label = cls._get_measurement_label(condition, report_data)
+        fig, ax = plt.subplots(figsize=(10, 4.9))
 
-        fig, ax = plt.subplots(
-            figsize=(10, 4.8)
-        )
-
-        if cls._is_event_based(
-            condition,
-            report_data,
-        ):
-            ax.scatter(
-                dates,
-                values,
-                alpha=0.75,
-                s=30,
-                label="NASA observations",
-            )
-
-            ax.set_title(
-                f"{title} — Individual Observations",
-                fontsize=14,
-                fontweight="bold",
-            )
-
+        if not is_media and cls._is_event_based(condition, report_data):
+            ax.scatter(x_vals, values, alpha=0.8, s=36, color="#2563EB", label="Observations")
+            ax.set_title(f"{title} — Individual Observations & Chord Markers (A-Z)", fontsize=13.5, fontweight="bold")
         else:
-            ax.plot(
-                dates,
-                values,
-                marker="o",
-                markersize=3.5,
-                linewidth=1.6,
-                label="NASA observations",
-            )
+            ax.plot(x_vals, values, marker="o", markersize=4, linewidth=1.9, color="#1D4ED8", label="Observed Values")
+            ax.fill_between(x_vals, values, min(values), color="#3B82F6", alpha=0.10)
+            ax.set_title(f"{title} Over Time — Annotated with Chord Markers (A-Z)", fontsize=13.5, fontweight="bold")
 
-            ax.set_title(
-                f"{title} Over Time",
-                fontsize=14,
+        mean_val = float(np.mean(values))
+        ax.axhline(mean_val, color="#6B7280", linestyle=":", linewidth=1.2, label=f"Mean ({mean_val:.2f})")
+
+        # Annotate up to 12 evenly spaced points A, B, C... matched strictly to sound_events[point_index]
+        sonification = report_data.get("sonification", {}) or {}
+        sound_events = sonification.get("parameters", []) or []
+        chosen = SonificationService.sample_marker_indices(len(values), max_markers=12)
+
+        for marker_idx, point_index in enumerate(chosen):
+            letter = chr(65 + marker_idx)
+            arrow = ""
+            badge_fc = "#FEF3C7"
+            badge_ec = "#B45309"
+            if sound_events and point_index < len(sound_events):
+                p_dir = sound_events[point_index].get("pitch_direction", "initial")
+                if p_dir == "higher":
+                    arrow = "↑"
+                    badge_fc = "#DCFCE7"
+                    badge_ec = "#15803D"
+                elif p_dir == "lower":
+                    arrow = "↓"
+                    badge_fc = "#FEE2E2"
+                    badge_ec = "#B91C1C"
+
+            y_offset = 11 if (marker_idx % 2 == 0) else -16
+            ax.annotate(
+                f"{letter}{arrow}",
+                (x_vals[point_index], values[point_index]),
+                xytext=(0, y_offset),
+                textcoords="offset points",
+                ha="center",
+                va="center",
+                fontsize=8,
                 fontweight="bold",
+                color="#111827",
+                bbox={"boxstyle": "round,pad=0.22", "fc": badge_fc, "ec": badge_ec, "lw": 0.9},
             )
 
-        ax.set_xlabel(
-            cls._get_time_axis_label(
-                condition,
-                report_data,
-            )
-        )
+        ax.set_xlabel(cls._get_time_axis_label(condition, report_data, is_media), fontsize=10)
+        ax.set_ylabel(measurement_label, fontsize=10)
+        ax.grid(True, linestyle="--", alpha=0.35)
+        ax.legend(loc="best", fontsize=9)
 
-        ax.set_ylabel(
-            measurement_label
-        )
+        if is_media:
+            ax.set_xticks(x_vals)
+            ax.set_xticklabels(labels, rotation=35, ha="right", fontsize=8)
+        else:
+            locator = mdates.AutoDateLocator()
+            formatter = mdates.ConciseDateFormatter(locator)
+            ax.xaxis.set_major_locator(locator)
+            ax.xaxis.set_major_formatter(formatter)
+            fig.autofmt_xdate()
 
-        ax.grid(
-            True,
-            linestyle="--",
-            alpha=0.35,
-        )
-
-        ax.legend(
-            loc="best"
-        )
-
-        locator = mdates.AutoDateLocator()
-
-        formatter = mdates.ConciseDateFormatter(
-            locator
-        )
-
-        ax.xaxis.set_major_locator(
-            locator
-        )
-
-        ax.xaxis.set_major_formatter(
-            formatter
-        )
-
-        fig.autofmt_xdate()
+        # Add extra vertical headroom so annotations never clip
+        y_min, y_max = ax.get_ylim()
+        pad = (y_max - y_min) * 0.14 if y_max > y_min else 1.0
+        ax.set_ylim(y_min - pad * 0.7, y_max + pad)
         fig.tight_layout()
-
         return cls._figure_to_buffer(fig)
 
     @classmethod
-    def create_distribution_chart(
-        cls,
-        report_data: Dict[str, Any],
-    ) -> BytesIO:
-        """Create a histogram of retrieved observation values."""
-
-        condition = report_data.get(
-            "condition", "unknown"
-        )
-
-        _, values, _ = cls._extract_observations(
-            report_data
-        )
-
-        title = cls.CATEGORY_TITLES.get(
-            condition,
-            condition.capitalize(),
-        )
+    def create_distribution_chart(cls, report_data: Dict[str, Any]) -> BytesIO:
+        condition = report_data.get("condition", "unknown")
+        _, values, _, _ = cls._extract_observations(report_data)
+        title = cls.CATEGORY_TITLES.get(condition, condition.capitalize())
 
         if not values:
-            return cls._create_empty_chart(
-                f"{title} Distribution"
-            )
+            return cls._create_empty_chart(f"{title} Distribution")
 
-        measurement_label = cls._get_measurement_label(
-            condition,
-            report_data,
-        )
-
-        fig, ax = plt.subplots(
-            figsize=(9, 4.5)
-        )
+        measurement_label = cls._get_measurement_label(condition, report_data)
+        fig, ax = plt.subplots(figsize=(9, 4.3))
 
         if len(values) == 1:
-            ax.axvline(
-                values[0],
-                linewidth=2,
-                label=f"Observed value: {values[0]:.4f}",
-            )
-
-            ax.legend(
-                loc="best"
-            )
-
-            ax.set_title(
-                f"{title} — Single Observation",
-                fontsize=14,
-                fontweight="bold",
-            )
-
+            ax.axvline(values[0], linewidth=2, color="#2563EB", label=f"Observed value: {values[0]:.4f}")
+            ax.legend(loc="best")
+            ax.set_title(f"{title} — Single Observation", fontsize=13.5, fontweight="bold")
         else:
-            bins = min(
-                20,
-                max(5, int(np.sqrt(len(values)))),
-            )
+            bins = min(20, max(5, int(np.sqrt(len(values)))))
+            ax.hist(values, bins=bins, color="#3B82F6", edgecolor="#1E3A8A", alpha=0.82)
+            ax.axvline(float(np.mean(values)), color="#DC2626", linestyle="--", linewidth=1.4, label=f"Mean: {np.mean(values):.2f}")
+            ax.legend(loc="best", fontsize=9)
+            ax.set_title(f"{title} Value Distribution", fontsize=13.5, fontweight="bold")
 
-            ax.hist(
-                values,
-                bins=bins,
-                edgecolor="black",
-                alpha=0.8,
-            )
-
-            ax.set_title(
-                f"{title} Value Distribution",
-                fontsize=14,
-                fontweight="bold",
-            )
-
-        ax.set_xlabel(
-            measurement_label
-        )
-
-        ax.set_ylabel(
-            "Observation Frequency"
-        )
-
-        ax.grid(
-            axis="y",
-            linestyle="--",
-            alpha=0.35,
-        )
-
+        ax.set_xlabel(measurement_label, fontsize=10)
+        ax.set_ylabel("Observation Frequency", fontsize=10)
+        ax.grid(axis="y", linestyle="--", alpha=0.35)
         fig.tight_layout()
-
         return cls._figure_to_buffer(fig)
 
     @classmethod
-    def generate_charts(
-        cls,
-        report_data: Dict[str, Any],
-    ) -> Dict[str, BytesIO]:
-        """Generate all charts required by the PDF generator."""
-
+    def generate_charts(cls, report_data: Dict[str, Any]) -> Dict[str, BytesIO]:
         return {
-            "observation_chart": cls.create_observation_chart(
-                report_data
-            ),
-            "distribution_chart": cls.create_distribution_chart(
-                report_data
-            ),
+            "observation_chart": cls.create_observation_chart(report_data),
+            "distribution_chart": cls.create_distribution_chart(report_data),
         }

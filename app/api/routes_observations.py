@@ -1,5 +1,7 @@
 """NASA environmental observation retrieval route."""
 from fastapi import APIRouter, HTTPException, Query
+from fastapi.responses import Response
+import csv, io, json
 from app.schemas.requests import ObservationRequest
 from app.schemas.responses import ModuleResponse, UncertaintyInfo
 from app.schemas.common import GeoLocation, ResultType, EnvironmentalCategory
@@ -86,3 +88,59 @@ async def get_observations_get(
         end_date=end_date,
     )
     return await get_observations(req)
+
+
+@router.get("/data/export/{category}")
+async def export_historical_data(
+    category: str,
+    latitude: float = Query(..., ge=-90, le=90),
+    longitude: float = Query(..., ge=-180, le=180),
+    start_date: str = Query("2001-01-01"),
+    end_date: str = Query("2025-12-31"),
+    format: str = Query("csv", pattern="^(csv|json)$"),
+):
+    """Export exactly the observations returned by the configured adapter."""
+    try:
+        cat_enum = EnvironmentalCategory(category.lower())
+    except ValueError:
+        raise HTTPException(status_code=400, detail=f"Unsupported category: {category}")
+    try:
+        points, metadata, unit = await ObservationService.get_observations(
+            category=cat_enum.value,
+            latitude=latitude,
+            longitude=longitude,
+            start_date=start_date,
+            end_date=end_date,
+        )
+    except Exception as exc:
+        raise HTTPException(status_code=502, detail=f"Could not retrieve source observations: {exc}") from exc
+    records = [
+        {"timestamp": point.timestamp, "value": point.value, "unit": point.unit or unit}
+        for point in points
+    ]
+    payload = {
+        "category": cat_enum.value,
+        "location": {"latitude": latitude, "longitude": longitude},
+        "requested_period": {"start_date": start_date, "end_date": end_date},
+        "unit": unit,
+        "data_source": metadata.model_dump(mode="json"),
+        "record_count": len(records),
+        "records": records,
+        "notice": "Contains only records returned by the configured adapter; coverage and resolution are defined by source metadata. No missing periods are fabricated.",
+    }
+    safe_category = cat_enum.value
+    if format == "json":
+        return Response(
+            content=json.dumps(payload, indent=2, default=str),
+            media_type="application/json",
+            headers={"Content-Disposition": f'attachment; filename="earthjukebox_{safe_category}_history.json"'},
+        )
+    buffer = io.StringIO()
+    writer = csv.DictWriter(buffer, fieldnames=["timestamp", "value", "unit"])
+    writer.writeheader()
+    writer.writerows(records)
+    return Response(
+        content=buffer.getvalue(),
+        media_type="text/csv",
+        headers={"Content-Disposition": f'attachment; filename="earthjukebox_{safe_category}_history.csv"'},
+    )

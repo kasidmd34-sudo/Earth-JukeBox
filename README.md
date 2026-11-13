@@ -704,3 +704,86 @@ We acknowledge the work of:
 ### 🌎 Earth Jukebox
 
 **Turning Earth's environmental data into intelligence — and intelligence into sound.**
+
+---
+
+## Earth Jukebox — enhanced demo and data export
+
+### Run locally
+
+```bash
+# Windows PowerShell
+py -3.11 -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python -m pip install --upgrade pip
+pip install -r requirements.txt
+copy .env.example .env
+uvicorn app.main:app --reload
+```
+
+Open `http://127.0.0.1:8000/demo` for the interactive demo and
+`http://127.0.0.1:8000/docs` for the API.
+
+### New / updated capabilities
+
+- **Place lookup:** `GET /location/search?q=Mumbai` uses OpenStreetMap Nominatim
+  and returns candidate names plus coordinates. The frontend asks you to choose
+  the correct candidate. Please retain OpenStreetMap attribution and respect
+  Nominatim's usage policy.
+- **Historical export:** `GET /data/export/{category}` accepts `latitude`,
+  `longitude`, `start_date`, `end_date`, and `format=csv|json`. The export
+  contains only observations actually returned by the selected adapter.
+- **Chord-aware sonification:** `/sonification` events now include alphabetic
+  event labels, triad note names, MIDI values, frequencies and pitch direction.
+  The browser synthesizes the chord and pulses the corresponding event on the
+  observation chart during playback.
+- **Interactive Earth:** the demo uses Three.js with drag-to-rotate and
+  scroll-to-zoom controls. The Earth is a geographic overview; the live playback
+  cursor belongs to the environmental chart.
+- **PDF chord cross-reference:** selected chart points are annotated A, B, C…
+  and the PDF includes a chord-event table with timestamp, value, notes, MIDI,
+  frequencies and higher/lower pitch movement.
+- **Parameter themes:** each environmental category applies a distinct colour
+  palette and sound profile.
+
+### Important scientific data notes
+
+The API can only export the records supplied by each current adapter. Some
+adapters in this codebase discover granules from a NASA catalogue but do not yet
+download and decode those granules into local time series. In particular:
+
+- `ice` currently uses NASA POWER surface temperature (`TS`) as a polar proxy;
+  it is **not** sea-ice extent or area from NSIDC.
+- `ocean` currently uses NASA POWER surface temperature (`TS`) as a proxy;
+  it is **not** the GHRSST MUR `analysed_sst` field.
+- `storms` currently uses NASA POWER corrected precipitation
+  (`PRECTOTCORR`) as a proxy; it is **not** cyclone track or storm intensity data.
+- `vegetation` currently uses the configured NASA POWER PAR variable; it is
+  **not** MODIS NDVI/EVI.
+- `fires` is a recent active-fire detection feed and should not be treated as
+  an arbitrary long-term historical archive.
+
+The returned `data_source` metadata and report limitations should be checked
+before interpreting or comparing any exported series. No missing periods or
+measurements are filled with synthetic values.
+
+### Credentials and security
+
+Create `.env` from `.env.example` and add your own credentials locally.
+Never commit `.env`, API keys, NASA Earthdata tokens, FIRMS keys or Gemini keys.
+The distributed project archive intentionally excludes `.env`, `.git`, Python
+cache directories and cached response payloads. If a key from an older archive
+was ever committed to a public repository, rotate it.
+
+Gemini summaries fall back to a deterministic statistics summary when the
+configured API key is absent or the service is unavailable. Set a real
+`GEMINI_API_KEY`; the literal placeholder value is not a valid key.
+
+### Current implementation boundaries
+
+The media upload panel is currently a frontend intake placeholder; image/video
+vision analysis, media-derived sonification and media-specific PDF generation
+still require backend integration. Parameter categories have differentiated
+themes and profiles in the demo, but are not yet eight independent routed pages.
+The PDF uses static chart images with alphabetic event cross-references; it is
+not a fully interactive HTML report or a PDF with live zoomable charts.

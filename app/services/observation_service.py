@@ -109,14 +109,14 @@ class ObservationService:
             pts = await OceanDataAdapter.fetch_sst_series(latitude, longitude, start_year, end_year)
             meta = DataSourceMetadata(
                 organization="NASA",
-                dataset_name="GHRSST Level 4 MUR Global SST & NASA POWER Surface Temperature (TS)",
-                dataset_identifier="MUR-JPL-L4-GLOB-v4.1_POWER_TS",
+                dataset_name="NASA POWER Monthly Surface Temperature (TS) proxy; MUR granule discovery is separate",
+                dataset_identifier="POWER_MONTHLY_TS_PROXY",
                 provider_daac="NASA PO.DAAC / Langley ASDC",
                 api_endpoint="https://podaac.jpl.nasa.gov",
                 retrieved_at=datetime.utcnow().isoformat() + "Z",
-                variables=["analysed_sst", "TS"],
-                spatial_resolution="0.01 - 0.5 degrees",
-                temporal_resolution="Daily / Monthly Climatology",
+                variables=["TS"],
+                spatial_resolution="0.5 x 0.625 degrees",
+                temporal_resolution="Monthly",
                 license_or_access="NASA Open Earth Science Data",
             )
             return pts, meta, "degrees_Celsius"
@@ -154,7 +154,7 @@ class ObservationService:
                 provider_daac="NASA GES DISC",
                 api_endpoint="https://gpm.nasa.gov/data/imerg",
                 retrieved_at=datetime.utcnow().isoformat() + "Z",
-                variables=["precipitationCal", "PRECTOTCORR"],
+                variables=["PRECTOTCORR"],
                 spatial_resolution="0.1 x 0.1 degree",
                 temporal_resolution="Daily / Monthly",
                 license_or_access="NASA Earthdata Open Access",
