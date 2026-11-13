@@ -23,7 +23,8 @@ from app.api import (
     routes_media
 )
 from app.web import pages as web_pages
-
+from app.api import routes_media
+ 
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(name)s: %(message)s"
@@ -129,3 +130,4 @@ app.include_router(routes_metadata.router)
 app.include_router(reports_router)
 app.include_router(routes_media.router)
 app.include_router(web_pages.router)
+app.include_router(routes_media.router)

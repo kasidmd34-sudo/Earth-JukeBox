@@ -10,7 +10,7 @@
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root{--accent:#42d9ed;--accent2:#4388ff;--bg:#070b17;--panel:#0d1528;--panel2:#111e35;--line:rgba(132,165,230,.16);--blue:#4388ff;--cyan:#42d9ed;--text:#edf3ff;--muted:#91a0bb;--green:#47d7a0;--red:#ff7187;--amber:#ffca70;--radius:18px}
-*{box-sizing:border-box;margin:0;padding:0}html{scroll-behavior:smooth}body{min-height:100vh;background:radial-gradient(ellipse at 80% -10%,rgba(46,104,220,.2),transparent 36%),radial-gradient(ellipse at 0 40%,rgba(23,132,160,.09),transparent 32%),var(--bg);color:var(--text);font-family:Manrope,system-ui,sans-serif}button,input,select{font:inherit}button{cursor:pointer}.container{width:min(1240px,92%);margin:auto}.mono{font-family:'DM Mono',monospace}.muted{color:var(--muted)}.tiny{font-size:11px;color:var(--muted);line-height:1.7}.navbar{height:72px;position:sticky;top:0;z-index:20;background:rgba(7,11,23,.88);backdrop-filter:blur(16px);border-bottom:1px solid var(--line)}.nav-inner{height:100%;display:flex;align-items:center;justify-content:space-between}.brand{display:flex;align-items:center;gap:11px;font-weight:800;letter-spacing:-.5px}.brand-mark{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;background:linear-gradient(135deg,#2879ff,#32d6e8);font-size:20px}.brand span{color:var(--cyan)}.navlinks{display:flex;gap:25px}.navlinks a{font-size:12px;color:var(--muted);text-decoration:none}.navlinks a:hover{color:white}.connection{display:flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:30px;padding:8px 12px;font:10px 'DM Mono';color:var(--muted)}.dot{width:7px;height:7px;border-radius:50%;background:var(--amber);box-shadow:0 0 10px currentColor}.dot.online{background:var(--green)}.hero{padding:65px 0 42px;display:grid;grid-template-columns:1.15fr .85fr;gap:35px;align-items:center}.eyebrow,.section-kicker{font:10px 'DM Mono';letter-spacing:1.7px;color:var(--cyan);text-transform:uppercase}.eyebrow{display:flex;gap:9px;align-items:center;margin-bottom:18px}.eyebrow:before{content:'';width:22px;height:1px;background:var(--cyan)}h1{font-size:clamp(42px,6vw,72px);line-height:1.04;letter-spacing:-3px;max-width:720px}h1 span{background:linear-gradient(100deg,#4388ff,#42d9ed);background-clip:text;color:transparent}.hero p{max-width:620px;color:var(--muted);font-size:14px;line-height:1.9;margin:20px 0 25px}.actions{display:flex;gap:10px;flex-wrap:wrap}.btn{border:0;border-radius:10px;padding:12px 17px;font-weight:800;font-size:12px;transition:.2s}.btn:hover{transform:translateY(-1px)}.btn-primary{background:linear-gradient(110deg,var(--accent2),var(--accent));color:white;box-shadow:0 8px 25px #2879ff2c}.btn-secondary{background:#111c31;border:1px solid var(--line);color:var(--text)}.btn:disabled{opacity:.5;cursor:not-allowed;transform:none}.earth-art{height:300px;display:grid;place-items:center;position:relative}#earth3d{width:280px;height:280px;max-width:100%;display:block;cursor:grab;filter:drop-shadow(0 0 24px #347dcb55)}#earth3d:active{cursor:grabbing}.orbit{position:absolute;width:330px;height:100px;border:1px solid #52c9ff66;border-radius:50%;transform:rotate(-23deg)}.orbit:after{content:'';position:absolute;left:43px;top:12px;width:9px;height:9px;border-radius:50%;background:var(--cyan);box-shadow:0 0 15px var(--cyan)}.earth-caption{position:absolute;bottom:0;color:var(--muted);font:9px 'DM Mono';letter-spacing:2px}.section{padding:38px 0}.section-head{margin-bottom:20px}.section-head h2{font-size:27px;letter-spacing:-.8px;margin:8px 0}.section-head p{font-size:12px;color:var(--muted);line-height:1.8}.panel{background:linear-gradient(145deg,rgba(15,25,46,.96),rgba(10,17,32,.96));border:1px solid var(--line);border-radius:var(--radius);padding:22px}.panel-title{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:18px}.panel-title h3{font-size:15px}.panel-title span{font:9px 'DM Mono';letter-spacing:1px;color:var(--cyan)}.location-grid{display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:13px}.field{display:flex;flex-direction:column;gap:7px}.field label{font-size:10px;font-weight:800;color:var(--muted)}.field input,.field select{width:100%;min-width:0;background:#080f20;border:1px solid var(--line);border-radius:9px;padding:12px;color:var(--text);outline:none;font-size:12px}.field input:focus,.field select:focus{border-color:var(--blue);box-shadow:0 0 0 3px #4388ff18}.field input::placeholder{color:#62718b}.location-actions{display:flex;gap:9px;align-items:end;flex-wrap:wrap}.location-meta{margin-top:14px;padding:11px 13px;background:#080f20;border:1px solid var(--line);border-radius:10px;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;font:10px 'DM Mono';color:var(--muted)}.category-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.category{padding:17px;border-radius:14px;background:linear-gradient(145deg,#111e35,#0b1427);border:1px solid var(--line);cursor:pointer;transition:.2s;min-height:130px}.category:hover{transform:translateY(-3px);border-color:var(--accent)}.category.active{border-color:var(--accent);background:linear-gradient(145deg,#1b3b6d88,#0b1427);box-shadow:0 0 25px #4388ff15}.cat-icon{width:37px;height:37px;border-radius:11px;display:grid;place-items:center;background:#4388ff20;font-size:19px;margin-bottom:12px}.category h3{font-size:13px;margin-bottom:5px}.category p{font-size:10px;color:var(--muted);line-height:1.6}.category .chosen{display:none;color:var(--cyan);font:9px 'DM Mono';margin-top:9px}.category.active .chosen{display:block}.workspace{display:grid;grid-template-columns:1.35fr .65fr;gap:15px;align-items:start}.toolbar{display:flex;gap:8px;flex-wrap:wrap}.toolbar .btn{padding:10px 13px}.statusbox{display:none;margin-top:13px;padding:11px 13px;border-radius:9px;font-size:11px;line-height:1.7}.statusbox.show{display:block}.statusbox.info{background:#4388ff14;border:1px solid #4388ff44;color:#a8c8ff}.statusbox.good{background:#47d7a012;border:1px solid #47d7a044;color:var(--green)}.statusbox.bad{background:#ff718712;border:1px solid #ff718744;color:#ff9aab}.chart-wrap{height:260px;position:relative;margin-top:12px}.chart-wrap canvas{width:100%;height:100%;display:block}.chart-legend{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:9px;font:9px 'DM Mono';color:var(--muted)}.metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-top:15px}.metric{background:#080f20;border:1px solid var(--line);border-radius:11px;padding:12px}.metric small{display:block;color:var(--muted);font-size:9px;margin-bottom:6px}.metric strong{font:17px 'DM Mono';color:var(--text)}.metric em{font-size:9px;color:var(--muted);font-style:normal}.side-stack{display:flex;flex-direction:column;gap:13px}.sound-panel{background:radial-gradient(ellipse at 80% 0,#1c559344,transparent 50%),#0d172b}.sound-meta{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin:14px 0}.sound-meta div{padding:10px;background:#080f20;border:1px solid var(--line);border-radius:9px}.sound-meta small{display:block;color:var(--muted);font-size:9px}.sound-meta b{font:12px 'DM Mono';display:block;margin-top:5px}.wave{height:62px;display:flex;align-items:center;justify-content:center;gap:4px;margin:12px 0}.wave i{display:block;width:4px;border-radius:5px;height:var(--h);background:linear-gradient(to top,#2879ff,#42d9ed);opacity:.75}.wave.playing i{animation:wave .55s ease-in-out infinite alternate}.wave.playing i:nth-child(3n){animation-delay:.18s}.wave.playing i:nth-child(3n + 1){animation-delay:.32s}@keyframes wave{to{transform:scaleY(.25);opacity:.4}}.player-controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.player-controls .btn{flex:1}.progress-row{display:flex;align-items:center;gap:9px;margin-top:13px;font:9px 'DM Mono';color:var(--muted)}input[type=range]{accent-color:var(--cyan);min-width:0;flex:1}.volume-row{display:flex;gap:10px;align-items:center;margin-top:10px;font-size:10px;color:var(--muted)}.info-card{padding:17px;border:1px solid var(--line);border-radius:14px;background:#101c32}.info-card h3{font-size:12px;margin-bottom:8px}.info-card p{font-size:10px;line-height:1.8;color:var(--muted)}.report-grid{display:grid;grid-template-columns:1fr 1fr;gap:13px}.report-grid .field.full{grid-column:1/-1}.report-note{font-size:10px;color:var(--muted);line-height:1.7;margin-top:12px}.footer{border-top:1px solid var(--line);padding:25px 0;margin-top:40px;color:var(--muted);font-size:10px;line-height:1.8}.footer-inner{display:flex;justify-content:space-between;gap:15px;flex-wrap:wrap}.hidden{display:none!important}
+*{box-sizing:border-box;margin:0;padding:0}html{scroll-behavior:smooth}body{min-height:100vh;background:radial-gradient(ellipse at 80% -10%,rgba(46,104,220,.2),transparent 36%),radial-gradient(ellipse at 0 40%,rgba(23,132,160,.09),transparent 32%),var(--bg);color:var(--text);font-family:Manrope,system-ui,sans-serif}button,input,select{font:inherit}button{cursor:pointer}.container{width:min(1240px,92%);margin:auto}.mono{font-family:'DM Mono',monospace}.muted{color:var(--muted)}.tiny{font-size:11px;color:var(--muted);line-height:1.7}.navbar{height:72px;position:sticky;top:0;z-index:20;background:rgba(7,11,23,.88);backdrop-filter:blur(16px);border-bottom:1px solid var(--line)}.nav-inner{height:100%;display:flex;align-items:center;justify-content:space-between}.brand{display:flex;align-items:center;gap:11px;font-weight:800;letter-spacing:-.5px}.brand-mark{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;background:linear-gradient(135deg,#2879ff,#32d6e8);font-size:20px}.brand span{color:var(--cyan)}.navlinks{display:flex;gap:25px}.navlinks a{font-size:12px;color:var(--muted);text-decoration:none}.navlinks a:hover{color:white}.connection{display:flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:30px;padding:8px 12px;font:10px 'DM Mono';color:var(--muted)}.dot{width:7px;height:7px;border-radius:50%;background:var(--amber);box-shadow:0 0 10px currentColor}.dot.online{background:var(--green)}.hero{padding:65px 0 42px;display:grid;grid-template-columns:1.15fr .85fr;gap:35px;align-items:center}.eyebrow,.section-kicker{font:10px 'DM Mono';letter-spacing:1.7px;color:var(--cyan);text-transform:uppercase}.eyebrow{display:flex;gap:9px;align-items:center;margin-bottom:18px}.eyebrow:before{content:'';width:22px;height:1px;background:var(--cyan)}h1{font-size:clamp(42px,6vw,72px);line-height:1.04;letter-spacing:-3px;max-width:720px}h1 span{background:linear-gradient(100deg,#4388ff,#42d9ed);background-clip:text;color:transparent}.hero p{max-width:620px;color:var(--muted);font-size:14px;line-height:1.9;margin:20px 0 25px}.actions{display:flex;gap:10px;flex-wrap:wrap}.btn{border:0;border-radius:10px;padding:12px 17px;font-weight:800;font-size:12px;transition:.2s}.btn:hover{transform:translateY(-1px)}.btn-primary{background:linear-gradient(110deg,var(--accent2),var(--accent));color:white;box-shadow:0 8px 25px #2879ff2c}.btn-secondary{background:#111c31;border:1px solid var(--line);color:var(--text)}.btn:disabled{opacity:.5;cursor:not-allowed;transform:none}.earth-art{height:300px;display:grid;place-items:center;position:relative}#earth3d{width:280px;height:280px;max-width:100%;display:block;cursor:grab;filter:drop-shadow(0 0 24px #347dcb55)}#earth3d:active{cursor:grabbing}.orbit{position:absolute;width:330px;height:100px;border:1px solid #52c9ff66;border-radius:50%;transform:rotate(-23deg)}.orbit:after{content:'';position:absolute;left:43px;top:12px;width:9px;height:9px;border-radius:50%;background:var(--cyan);box-shadow:0 0 15px var(--cyan)}.earth-caption{position:absolute;bottom:0;color:var(--muted);font:9px 'DM Mono';letter-spacing:2px}.section{padding:38px 0}.section-head{margin-bottom:20px}.section-head h2{font-size:27px;letter-spacing:-.8px;margin:8px 0}.section-head p{font-size:12px;color:var(--muted);line-height:1.8}.panel{background:linear-gradient(145deg,rgba(15,25,46,.96),rgba(10,17,32,.96));border:1px solid var(--line);border-radius:var(--radius);padding:22px}.panel-title{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:18px}.panel-title h3{font-size:15px}.panel-title span{font:9px 'DM Mono';letter-spacing:1px;color:var(--cyan)}.location-grid{display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:13px}.field{display:flex;flex-direction:column;gap:7px}.field label{font-size:10px;font-weight:800;color:var(--muted)}.field input,.field select{width:100%;min-width:0;background:#080f20;border:1px solid var(--line);border-radius:9px;padding:12px;color:var(--text);outline:none;font-size:12px}.field input:focus,.field select:focus{border-color:var(--blue);box-shadow:0 0 0 3px #4388ff18}.field input::placeholder{color:#62718b}.location-actions{display:flex;gap:9px;align-items:end;flex-wrap:wrap}.location-meta{margin-top:14px;padding:11px 13px;background:#080f20;border:1px solid var(--line);border-radius:10px;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;font:10px 'DM Mono';color:var(--muted)}.category-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.category{padding:17px;border-radius:14px;background:linear-gradient(145deg,#111e35,#0b1427);border:1px solid var(--line);cursor:pointer;transition:.2s;min-height:130px}.category:hover{transform:translateY(-3px);border-color:var(--accent)}.category.active{border-color:var(--accent);background:linear-gradient(145deg,#1b3b6d88,#0b1427);box-shadow:0 0 25px #4388ff15}.cat-icon{width:37px;height:37px;border-radius:11px;display:grid;place-items:center;background:#4388ff20;font-size:19px;margin-bottom:12px}.category h3{font-size:13px;margin-bottom:5px}.category p{font-size:10px;color:var(--muted);line-height:1.6}.category .chosen{display:none;color:var(--cyan);font:9px 'DM Mono';margin-top:9px}.category.active .chosen{display:block}.workspace{display:grid;grid-template-columns:1.35fr .65fr;gap:15px;align-items:start}.toolbar{display:flex;gap:8px;flex-wrap:wrap}.toolbar .btn{padding:10px 13px}.statusbox{display:none;margin-top:13px;padding:11px 13px;border-radius:9px;font-size:11px;line-height:1.7}.statusbox.show{display:block}.statusbox.info{background:#4388ff14;border:1px solid #4388ff44;color:#a8c8ff}.statusbox.good{background:#47d7a012;border:1px solid #47d7a044;color:var(--green)}.statusbox.bad{background:#ff718712;border:1px solid #ff718744;color:#ff9aab}#mediaStatus{white-space:pre-wrap}.chart-wrap{height:260px;position:relative;margin-top:12px}.chart-wrap canvas{width:100%;height:100%;display:block}.chart-legend{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:9px;font:9px 'DM Mono';color:var(--muted)}.metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-top:15px}.metric{background:#080f20;border:1px solid var(--line);border-radius:11px;padding:12px}.metric small{display:block;color:var(--muted);font-size:9px;margin-bottom:6px}.metric strong{font:17px 'DM Mono';color:var(--text)}.metric em{font-size:9px;color:var(--muted);font-style:normal}.side-stack{display:flex;flex-direction:column;gap:13px}.sound-panel{background:radial-gradient(ellipse at 80% 0,#1c559344,transparent 50%),#0d172b}.sound-meta{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin:14px 0}.sound-meta div{padding:10px;background:#080f20;border:1px solid var(--line);border-radius:9px}.sound-meta small{display:block;color:var(--muted);font-size:9px}.sound-meta b{font:12px 'DM Mono';display:block;margin-top:5px}.wave{height:62px;display:flex;align-items:center;justify-content:center;gap:4px;margin:12px 0}.wave i{display:block;width:4px;border-radius:5px;height:var(--h);background:linear-gradient(to top,#2879ff,#42d9ed);opacity:.75}.wave.playing i{animation:wave .55s ease-in-out infinite alternate}.wave.playing i:nth-child(3n){animation-delay:.18s}.wave.playing i:nth-child(3n + 1){animation-delay:.32s}@keyframes wave{to{transform:scaleY(.25);opacity:.4}}.player-controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.player-controls .btn{flex:1}.progress-row{display:flex;align-items:center;gap:9px;margin-top:13px;font:9px 'DM Mono';color:var(--muted)}input[type=range]{accent-color:var(--cyan);min-width:0;flex:1}.volume-row{display:flex;gap:10px;align-items:center;margin-top:10px;font-size:10px;color:var(--muted)}.info-card{padding:17px;border:1px solid var(--line);border-radius:14px;background:#101c32}.info-card h3{font-size:12px;margin-bottom:8px}.info-card p{font-size:10px;line-height:1.8;color:var(--muted)}.report-grid{display:grid;grid-template-columns:1fr 1fr;gap:13px}.report-grid .field.full{grid-column:1/-1}.report-note{font-size:10px;color:var(--muted);line-height:1.7;margin-top:12px}.footer{border-top:1px solid var(--line);padding:25px 0;margin-top:40px;color:var(--muted);font-size:10px;line-height:1.8}.footer-inner{display:flex;justify-content:space-between;gap:15px;flex-wrap:wrap}.hidden{display:none!important}
 @media(max-width:900px){.hero{grid-template-columns:1fr}.earth-art{height:250px}.workspace{grid-template-columns:1fr}.category-grid{grid-template-columns:repeat(4,1fr)}}
 @media(max-width:650px){.navlinks{display:none}.hero{padding-top:42px}.hero h1{letter-spacing:-1.8px}.category-grid{grid-template-columns:repeat(2,1fr)}.location-grid{grid-template-columns:1fr 1fr}.location-grid .field:first-child{grid-column:1/-1}.report-grid{grid-template-columns:1fr}.report-grid .field.full{grid-column:auto}.panel{padding:16px}.metrics{grid-template-columns:1fr 1fr}.earth-art{height:220px}#earth3d{width:220px;height:220px}.orbit{width:270px}}
 </style>
@@ -104,8 +104,17 @@
 
 <section class="container section" id="media">
  <div class="section-head"><div class="section-kicker">04 / MEDIA LAB</div><h2>Explore an image or nature video</h2><p>Visual interpretation is separate from calibrated NASA measurement and will not be presented as satellite-derived temperature, NDVI or fire radiative power.</p></div>
- <div class="panel"><div class="field"><label for="mediaFile">Environmental image or video</label><input id="mediaFile" type="file" accept="image/*,video/mp4,video/webm,video/quicktime"></div><div class="actions" style="margin-top:12px"><button class="btn btn-primary" id="analyzeMediaBtn">Analyze uploaded media</button></div><div id="mediaStatus" class="statusbox" role="status"></div><p class="report-note">The current upload interface is staged; AI media interpretation still needs backend integration.</p></div>
+ <div class="panel">
+  <div class="field"><label for="mediaFile">Environmental image or video</label><input id="mediaFile" type="file" accept="image/*,video/mp4,video/webm,video/quicktime"></div>
+  <div class="actions" style="margin-top:12px">
+   <button class="btn btn-primary" id="analyzeMediaBtn">Analyze uploaded media</button>
+   <button class="btn btn-secondary" id="downloadMediaPdfBtn" disabled>↓ Download analysis PDF</button>
+  </div>
+  <div id="mediaStatus" class="statusbox" role="status" aria-live="polite"></div>
+  <p class="report-note">Uploaded media is sent to the FastAPI <code>/media/analyze</code> endpoint for visual interpretation only.</p>
+ </div>
 </section>
+
 <section class="container section" id="reports">
  <div class="section-head"><div class="section-kicker">05 / SCIENTIFIC REPORTS</div><h2>Take your analysis with you</h2><p>Generate a downloadable PDF using the same location, category and date range as your observation query.</p></div>
  <div class="panel">
@@ -126,6 +135,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 <script>
 // Earth Jukebox frontend. Environmental values and sound parameters always come from the FastAPI backend.
 const API_BASE = window.location.origin;
@@ -136,6 +146,7 @@ const CATEGORIES = {
 };
 let selectedCategory='temperature', observationResponse=null, observations=[], soundParameters=[], activeChartIndex=-1, blinkRaf=null;
 let audioContext=null, masterGain=null, playbackTimer=null, playbackIndex=0, playbackStartedAt=0, pausedElapsed=0, isPlaying=false;
+let lastMediaAnalysis=null;
 const $=id=>document.getElementById(id);
 
 function setStatus(id,message,type='info'){const el=$(id);el.textContent=message;el.className=`statusbox show ${type}`;}
@@ -147,7 +158,6 @@ function getLocation(){const latitude=safeNumber($('latitude').value),longitude=
 function updateLocationSummary(){try{const {latitude,longitude}=getLocation();$('coordinateSummary').textContent=`${latitude.toFixed(4)}°, ${longitude.toFixed(4)}°`;$('locationSummary').textContent=$('locationName').value.trim()||'Selected Location';}catch{ $('coordinateSummary').textContent='Enter valid coordinates';}}
 const CATEGORY_THEME={temperature:['#ffb35c','#ed7548'],rain:['#56c8f4','#397bd7'],wind:['#a4d8ff','#638bcb'],fires:['#ff815e','#d94d35'],ocean:['#52c8e8','#176aab'],ice:['#c9eaff','#6d9fca'],storms:['#bd9cff','#7758c9'],vegetation:['#79d89a','#36966b']};
 function updateCategory(category){if(!CATEGORIES[category])return;selectedCategory=category;const theme=CATEGORY_THEME[category];document.documentElement.style.setProperty('--accent',theme[0]);document.documentElement.style.setProperty('--accent2',theme[1]);document.body.dataset.category=category;document.querySelectorAll('.category').forEach(card=>card.classList.toggle('active',card.dataset.category===category));$('reportCategory').value=category;$('selectedCategoryTitle').textContent=`${CATEGORIES[category].name} observations`;$('queryHint').textContent=`Selected category: ${category}`;
- // Update a dedicated-page link inside the Observation Query panel:
  const openLink = $('openDedicatedPageLink');
  if (openLink) openLink.href = `/explore/${category}`;
 }
@@ -159,7 +169,7 @@ async function checkApi(){try{const r=await fetch(`${API_BASE}/health`,{method:'
 $('useLocationBtn').addEventListener('click',()=>{if(!navigator.geolocation){setStatus('locationStatus','Geolocation is not supported by this browser. Enter coordinates manually.','bad');return;}const btn=$('useLocationBtn');btn.disabled=true;btn.textContent='Getting location…';navigator.geolocation.getCurrentPosition(pos=>{ $('latitude').value=pos.coords.latitude.toFixed(6);$('longitude').value=pos.coords.longitude.toFixed(6);$('locationName').value='My current location';updateLocationSummary();setStatus('locationStatus','Your browser location has been selected. Press “Load NASA observations” to retrieve data for it.','good');btn.disabled=false;btn.textContent='◎ Use my current location';},err=>{let msg='Could not access your location.';if(err.code===1)msg='Location permission was denied. You can enter coordinates manually.';if(err.code===2)msg='Your current location is unavailable. Try entering coordinates manually.';if(err.code===3)msg='Location request timed out. Please try again.';setStatus('locationStatus',msg,'bad');btn.disabled=false;btn.textContent='◎ Use my current location';},{enableHighAccuracy:true,timeout:12000,maximumAge:60000});});
 $('applyLocationBtn').addEventListener('click',()=>{try{getLocation();updateLocationSummary();setStatus('locationStatus','Coordinates applied. Load an environmental category to retrieve observations.','good');}catch(e){setStatus('locationStatus',e.message,'bad');}});
 
-$('searchPlaceBtn').addEventListener('click',async()=>{const q=$('placeSearch').value.trim();if(q.length<2){setStatus('placeResults','Enter at least two characters.','bad');return;}const btn=$('searchPlaceBtn');btn.disabled=true;btn.textContent='Searching…';try{const r=await fetch(`${API_BASE}/location/search?q=${encodeURIComponent(q)}`),data=await r.json();if(!r.ok)throw new Error(data.detail||'Place search failed.');if(!data.results?.length)throw new Error('No matching places found.');const choices=data.results.map((x,i)=>`${i+1}. ${x.display_name} (${Number(x.latitude).toFixed(4)}, ${Number(x.longitude).toFixed(4)})`).join('\\n');const selected=prompt(`Choose a matching place by number:\\n\\n${choices}`,'1');if(selected===null)return;const item=data.results[Number(selected)-1];if(!item)throw new Error('Invalid place selection.');$('latitude').value=item.latitude;$('longitude').value=item.longitude;$('locationName').value=item.display_name;updateLocationSummary();setStatus('placeResults',`Resolved ${item.display_name}. Attribution: ${data.attribution}.`,'good');}catch(e){setStatus('placeResults',e.message,'bad');}finally{btn.disabled=false;btn.textContent='Find coordinates';}});
+$('searchPlaceBtn').addEventListener('click',async()=>{const q=$('placeSearch').value.trim();if(q.length<2){setStatus('placeResults','Enter at least two characters.','bad');return;}const btn=$('searchPlaceBtn');btn.disabled=true;btn.textContent='Searching…';try{const r=await fetch(`${API_BASE}/location/search?q=${encodeURIComponent(q)}`),data=await r.json();if(!r.ok)throw new Error(data.detail||'Place search failed.');if(!data.results?.length)throw new Error('No matching places found.');const choices=data.results.map((x,i)=>`${i+1}. ${x.display_name} (${Number(x.latitude).toFixed(4)}, ${Number(x.longitude).toFixed(4)})`).join('\n');const selected=prompt(`Choose a matching place by number:\n\n${choices}`,'1');if(selected===null)return;const item=data.results[Number(selected)-1];if(!item)throw new Error('Invalid place selection.');$('latitude').value=item.latitude;$('longitude').value=item.longitude;$('locationName').value=item.display_name;updateLocationSummary();setStatus('placeResults',`Resolved ${item.display_name}. Attribution: ${data.attribution}.`,'good');}catch(e){setStatus('placeResults',e.message,'bad');}finally{btn.disabled=false;btn.textContent='Find coordinates';}});
 async function exportHistory(format){let loc;try{loc=getLocation();}catch(e){setStatus('dataStatus',e.message,'bad');return;}const q=new URLSearchParams({latitude:loc.latitude,longitude:loc.longitude,start_date:$('startDate').value,end_date:$('endDate').value,format});try{const r=await fetch(`${API_BASE}/data/export/${selectedCategory}?${q}`);if(!r.ok){const b=await r.json().catch(()=>({}));throw new Error(b.detail||'Export failed.');}const blob=await r.blob(),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=`earthjukebox_${selectedCategory}_history.${format}`;a.click();URL.revokeObjectURL(url);setStatus('dataStatus','Export contains only returned source records; no missing periods were fabricated.','good');}catch(e){setStatus('dataStatus',e.message,'bad');}}
 $('exportCsvBtn').addEventListener('click',()=>exportHistory('csv'));$('exportJsonBtn').addEventListener('click',()=>exportHistory('json'));
 function normalizeObservationResponse(payload){const raw=payload?.historical_data??payload?.observations??payload?.data??[];if(!Array.isArray(raw))throw new Error('The observations endpoint did not return an observation array.');const points=raw.map(p=>({timestamp:p.timestamp??p.date??p.time??'',value:safeNumber(p.value??p.original_value)})).filter(p=>p.value!==null);return points;}
@@ -173,7 +183,6 @@ function drawChart(points,unit){const canvas=$('observationChart'),ctx=canvas.ge
  ctx.beginPath();points.forEach((p,i)=>{if(i===0)ctx.moveTo(x(i),y(p.value));else ctx.lineTo(x(i),y(p.value));});ctx.strokeStyle='#42d9ed';ctx.lineWidth=2.2;ctx.stroke();
  points.forEach((p,i)=>{if(points.length<=35||i%Math.ceil(points.length/35)===0){ctx.beginPath();ctx.arc(x(i),y(p.value),2.6,0,Math.PI*2);ctx.fillStyle='#edf3ff';ctx.fill();}});
 
- // Alphabetical chord markers A-L, matched to soundParameters[idx]
  const markerCount = Math.min(12, points.length);
  const chosen = [];
  for (let j = 0; j < markerCount; j++) {
@@ -192,7 +201,6 @@ function drawChart(points,unit){const canvas=$('observationChart'),ctx=canvas.ge
    ctx.fillText(label + arrow, cx, cy + 3);
  });
 
- // Live blinking dot + halo on graph during playback (never on Earth surface)
  if (activeChartIndex >= 0 && activeChartIndex < points.length) {
    const px = x(activeChartIndex), py = y(points[activeChartIndex].value);
    const pulse = 0.5 + 0.5 * Math.sin(performance.now() / 110);
@@ -212,14 +220,12 @@ async function loadObservations(){let loc;try{loc=getLocation();}catch(e){setSta
  const btn=$('loadDataBtn');btn.disabled=true;btn.textContent='Loading observations…';setStatus('dataStatus',`Requesting ${selectedCategory} observations for ${$('locationName').value.trim()||'the selected coordinates'}…`,'info');
  const q=new URLSearchParams({category:selectedCategory,latitude:String(loc.latitude),longitude:String(loc.longitude),start_date:start,end_date:end});
  try{
-  // Request 1: NASA observations for the chart and statistics.
   const observationResponseHttp=await fetch(`${API_BASE}/observations?${q.toString()}`,{headers:{Accept:'application/json'}});
   const payload=await observationResponseHttp.json().catch(()=>({}));
   if(!observationResponseHttp.ok)throw new Error(payload.detail||`Observation request failed (HTTP ${observationResponseHttp.status}).`);
   const points=normalizeObservationResponse(payload);
   if(!points.length)throw new Error('The API returned no usable observations for this category, location and date range. Try another date range or location.');
 
-  // Request 2: dedicated sonification endpoint for audio parameters.
   const soundQuery=new URLSearchParams({category:selectedCategory,latitude:String(loc.latitude),longitude:String(loc.longitude),start_date:start,end_date:end,include_prediction:'false'});
   const soundHttp=await fetch(`${API_BASE}/sonification?${soundQuery.toString()}`,{headers:{Accept:'application/json'}});
   const soundPayload=await soundHttp.json().catch(()=>({}));
@@ -245,7 +251,6 @@ function playTone(param){if(!audioContext||!masterGain)return;const now=audioCon
 
 function scheduleNext(){if(!isPlaying)return;if(playbackIndex>=soundParameters.length){stopPlayback(true);return;}const p=soundParameters[playbackIndex],duration=getParameterDuration(p);activeChartIndex=Math.min(observations.length-1,Math.round(playbackIndex*Math.max(0,observations.length-1)/Math.max(1,soundParameters.length-1)));drawChart(observations,observationResponse?.unit||'');playTone(p);$('currentNote').textContent=p.chordName||p.note||`${Math.round(p.pitch)} Hz`;$('currentPoint').textContent=`${playbackIndex+1} / ${soundParameters.length}`;$('progress').value=playbackIndex;$('elapsed').textContent=formatTime(getElapsedSoundDuration(playbackIndex));playbackIndex++;playbackTimer=setTimeout(scheduleNext,duration);}
 async function startPlayback(){if(!soundParameters.length){setStatus('dataStatus','Load observations with sonification parameters before playing.','bad');return;}try{await ensureAudio();if(isPlaying)return;isPlaying=true;
- // Smooth requestAnimationFrame loop so the live graph point blinks fluidly
  cancelAnimationFrame(blinkRaf);
  const blinkLoop=()=>{if(!isPlaying)return;if(observations.length)drawChart(observations,observationResponse?.unit||'');blinkRaf=requestAnimationFrame(blinkLoop);};
  blinkRaf=requestAnimationFrame(blinkLoop);
@@ -270,7 +275,195 @@ function initEarth3D(){const canvas=$('earth3d');if(!canvas||!window.THREE)retur
  new THREE.TextureLoader().load('https://threejs.org/examples/textures/planets/earth_atmos_2048.jpg',texture=>{globe.material.map=texture;globe.material.color.set(0xffffff);globe.material.needsUpdate=true;},undefined,()=>{});const resize=()=>{const w=canvas.clientWidth||280,h=canvas.clientHeight||280;renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();};resize();window.addEventListener('resize',resize);const animate=()=>{requestAnimationFrame(animate);if(!controls)globe.rotation.y+=.0015;else controls.update();renderer.render(scene,camera);};animate();}catch(e){console.warn('3D globe unavailable:',e);}}
 window.addEventListener('resize',()=>{if(observations.length)drawChart(observations,observationResponse?.unit||'');});
 initEarth3D();
-$('analyzeMediaBtn').addEventListener('click',()=>{const f=$('mediaFile').files?.[0];if(!f){setStatus('mediaStatus','Choose an image or video first.','bad');return;}setStatus('mediaStatus',`Selected ${f.name}. The media upload interface is present, but AI image/video interpretation is not yet connected to the backend in this build.`,'info');});
+
+$('mediaFile').addEventListener('change', () => {
+  lastMediaAnalysis = null;
+  $('downloadMediaPdfBtn').disabled = true;
+});
+
+function loadImageForPdf(file) {
+  return new Promise((resolve, reject) => {
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => {
+      try {
+        const maxDim = 1600;
+        const scale = Math.min(1, maxDim / Math.max(img.naturalWidth, img.naturalHeight));
+        const canvas = document.createElement('canvas');
+        canvas.width = Math.round(img.naturalWidth * scale);
+        canvas.height = Math.round(img.naturalHeight * scale);
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        resolve({
+          dataUrl: canvas.toDataURL('image/jpeg', 0.9),
+          width: canvas.width,
+          height: canvas.height
+        });
+      } catch (e) {
+        reject(e);
+      } finally {
+        URL.revokeObjectURL(url);
+      }
+    };
+    img.onerror = () => {
+      URL.revokeObjectURL(url);
+      reject(new Error('Could not decode uploaded image for PDF.'));
+    };
+    img.src = url;
+  });
+}
+
+$('analyzeMediaBtn').addEventListener('click', async () => {
+  const f = $('mediaFile').files?.[0];
+  if (!f) {
+    setStatus('mediaStatus', 'Choose an image or video first.', 'bad');
+    return;
+  }
+
+  const maxBytes = 20 * 1024 * 1024;
+  if (f.size > maxBytes) {
+    setStatus('mediaStatus', 'File exceeds the 20 MB upload limit. Please choose a smaller image or video.', 'bad');
+    return;
+  }
+
+  const btn = $('analyzeMediaBtn');
+  const pdfBtn = $('downloadMediaPdfBtn');
+  btn.disabled = true;
+  pdfBtn.disabled = true;
+  lastMediaAnalysis = null;
+  btn.textContent = 'Analyzing media…';
+  setStatus('mediaStatus', `Uploading ${f.name} for visual interpretation…`, 'info');
+
+  try {
+    const formData = new FormData();
+    formData.append('file', f);
+
+    const response = await fetch(`${API_BASE}/media/analyze`, {
+      method: 'POST',
+      body: formData
+    });
+
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      throw new Error(data.detail || data.message || `Media analysis failed (HTTP ${response.status}).`);
+    }
+
+    const text = data.interpretation || data.analysis || 'No interpretation returned.';
+    const provider = data.provider || 'AI Vision';
+    lastMediaAnalysis = {
+      file: f,
+      filename: f.name,
+      provider,
+      text,
+      analyzedAt: new Date().toLocaleString()
+    };
+    pdfBtn.disabled = false;
+
+    setStatus('mediaStatus', `${f.name} (${provider}):\n\n${text}`, 'good');
+  } catch (err) {
+    setStatus('mediaStatus', err.message || 'Unable to analyze uploaded media.', 'bad');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Analyze uploaded media';
+  }
+});
+
+$('downloadMediaPdfBtn').addEventListener('click', async () => {
+  if (!lastMediaAnalysis) return;
+  if (!window.jspdf?.jsPDF) {
+    setStatus('mediaStatus', 'PDF library failed to load. Check your internet connection and refresh.', 'bad');
+    return;
+  }
+
+  const pdfBtn = $('downloadMediaPdfBtn');
+  pdfBtn.disabled = true;
+  pdfBtn.textContent = 'Building PDF…';
+
+  try {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ unit: 'pt', format: 'a4' });
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
+    const margin = 40;
+    const maxWidth = pageWidth - margin * 2;
+    let y = margin;
+
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(18);
+    doc.text('Earth Jukebox — Media Lab Analysis', margin, y);
+    y += 20;
+
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(10);
+    doc.setTextColor(90, 90, 90);
+    doc.text(`File: ${lastMediaAnalysis.filename}   |   Provider: ${lastMediaAnalysis.provider}`, margin, y);
+    y += 14;
+    doc.text(`Generated: ${lastMediaAnalysis.analyzedAt}`, margin, y);
+    y += 16;
+
+    doc.setFont('helvetica', 'italic');
+    doc.setFontSize(9);
+    const noteLines = doc.splitTextToSize(
+      'Note: Visual interpretation is separate from calibrated NASA satellite measurements and does not represent satellite-derived temperature, NDVI, or fire radiative power.',
+      maxWidth
+    );
+    doc.text(noteLines, margin, y);
+    y += noteLines.length * 12 + 12;
+
+    doc.setDrawColor(210, 210, 210);
+    doc.line(margin, y, pageWidth - margin, y);
+    y += 18;
+
+    if (lastMediaAnalysis.file.type.startsWith('image/')) {
+      const img = await loadImageForPdf(lastMediaAnalysis.file);
+      const maxImgHeight = 280;
+      const ratio = Math.min(maxWidth / img.width, maxImgHeight / img.height);
+      const drawW = img.width * ratio;
+      const drawH = img.height * ratio;
+      doc.addImage(img.dataUrl, 'JPEG', margin, y, drawW, drawH);
+      y += drawH + 22;
+    } else {
+      doc.setFont('helvetica', 'italic');
+      doc.setFontSize(10);
+      doc.text('(Video upload — media preview cannot be embedded in PDF.)', margin, y);
+      y += 20;
+    }
+
+    doc.setTextColor(20, 20, 20);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(12);
+    if (y > pageHeight - margin - 30) {
+      doc.addPage();
+      y = margin;
+    }
+    doc.text('Visual Interpretation', margin, y);
+    y += 18;
+
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(11);
+    const lines = doc.splitTextToSize(lastMediaAnalysis.text.replace(/\r\n/g, '\n'), maxWidth);
+    const lineHeight = 15;
+    for (const line of lines) {
+      if (y + lineHeight > pageHeight - margin) {
+        doc.addPage();
+        y = margin;
+      }
+      doc.text(line, margin, y);
+      y += lineHeight;
+    }
+
+    const baseName = lastMediaAnalysis.filename.replace(/\.[^.]+$/, '') || 'media';
+    doc.save(`${baseName}-analysis.pdf`);
+  } catch (err) {
+    setStatus('mediaStatus', err.message || 'Could not generate PDF.', 'bad');
+  } finally {
+    pdfBtn.disabled = false;
+    pdfBtn.textContent = '↓ Download analysis PDF';
+  }
+});
+
 updateLocationSummary();checkApi();
 </script>
 </body>
